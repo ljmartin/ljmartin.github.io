@@ -1,6 +1,12 @@
 <h2>Header text</h2>
 
-<p>I really like using Markdown. -update flag2</p>
+<p>I really like using Markdown. -update flag3</p>
+
+<ul>
+{% for date in site.data.Publication %}
+  <li>{{ date.Name" }}-{{ date.Published }}</li>
+{% endfor %}
+</ul>
 
 <ul>
 {% for cb in site.data.cannabinoids %}
