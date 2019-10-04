@@ -7,3 +7,12 @@ Data loading
  
 This page is to test the \_data loading feature of jekyll
  
+<ul>
+{% for cb in site.data.cannabinoids %}
+  <li>
+    <a href="https://www.ebi.ac.uk/chembl/compound_report_card/{{ cb.molecule_chemblid }}">
+      {{ cb.molecule_name }}
+    </a>
+  </li>
+{% endfor %}
+</ul>
