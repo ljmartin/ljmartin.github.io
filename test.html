@@ -16,7 +16,15 @@
 			</nav>
 			<div class="container">
 			
-			{{ content }}
+			<ul>
+			{% for cb in site.data.cannabinoids %}
+  				<li>
+    					<a href="https://www.ebi.ac.uk/chembl/compound_report_card/{{ cb.molecule_chemblid }}">
+      					{{ cb.molecule_name }}
+    					</a>
+  				</li>
+			{% endfor %}
+			</ul>
 			
 			</div><!-- /.container -->
 			<footer>
