@@ -1,6 +1,6 @@
 <h2>Header text</h2>
 
-<p>I really like using Markdown. -update flag</p>
+<p>I really like using Markdown. -update flag2</p>
 
 <ul>
 {% for cb in site.data.cannabinoids %}
@@ -13,6 +13,15 @@
 </ul>
 <ul>
 {% for member in site.data.members %}
+  <li>
+    <a href="https://github.com/{{ member.github }}">
+      {{ member.name }}
+    </a>
+  </li>
+{% endfor %}
+</ul>
+<ul>
+{% for member in data.members %}
   <li>
     <a href="https://github.com/{{ member.github }}">
       {{ member.name }}
