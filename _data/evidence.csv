@@ -1,13 +1,4 @@
-##Commented CSV file.
-##This contains known evidence for cannabinoid binding.
-##At the moment, only including publicly available data.
-##Initial source for data is GuideToPharmacology.
-##Later sources include literature search, or pubchem.
-##Attempts will be made to keep pchembl value above 5 (equivalent to 10uM.)
-##  for instance, mu opioid receptor paper uses 100uM as evidence and is therefore not included. 
-##Rat or mouse evidence uses the human chembl here.
 molecule_abbreviation,molecule_chemblid,tid,target_common_name,pmid,source
-#THC:
 "THC","CHEMBL465","CHEMBL218","Cannabinoid CB1 receptor","7565624","gtp"
 "THC","CHEMBL465","CHEMBL218","Cannabinoid CB1 receptor","8819477","gtp"
 "THC","CHEMBL465","CHEMBL253","Cannabinoid CB2 receptor","8626625","gtp"
@@ -26,11 +17,6 @@ molecule_abbreviation,molecule_chemblid,tid,target_common_name,pmid,source
 "THC","CHEMBL465","CHEMBL4972","Serotonin 3a (5-HT3a) receptor","20800662","me"
 "THC","CHEMBL465","CHEMBL4972","Serotonin 3a (5-HT3a) receptor","12381672","morales2017"
 "THC","CHEMBL465","","","",""
-"THC","CHEMBL465","","","",""
-"THC","CHEMBL465","","","",""
-"THC","CHEMBL465","","","",""
-"THC","CHEMBL465","","","",""
-#CBD:
 "CBD","CHEMBL190461","CHEMBL2384898","N-arachidonyl glycine receptor","21595653","gtp"
 "CBD","CHEMBL190461","CHEMBL1075322","G-protein coupled receptor 55","21079038","gtp"
 "CBD","CHEMBL190461","CHEMBL1075322","G-protein coupled receptor 55","17876302","gtp"
@@ -38,8 +24,4 @@ molecule_abbreviation,molecule_chemblid,tid,target_common_name,pmid,source
 "CBD","CHEMBL190461","CHEMBL5051","Transient receptor potential cation channel subfamily V member 2","18550765","gtp"
 "CBD","CHEMBL190461","CHEMBL5522","Transient receptor potential cation channel subfamily V member 3","21726418","gtp"
 "CBD","CHEMBL190461","CHEMBL1075319","Transient receptor potential cation channel subfamily M member 8","","gtp"
-"CBD","CHEMBL190461","","","",""
-"CBD","CHEMBL190461","","","",""
-"CBD","CHEMBL190461","","","",""
-"CBD","CHEMBL190461","","","",""
 "CBD","CHEMBL190461","","","",""
