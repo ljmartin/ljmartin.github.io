@@ -15,3 +15,13 @@ title: this a page
   </li>
 {% endfor %}
 </ul>
+
+<ul>
+  {% for ev in site.data.evidence %}
+  <li>
+    <a href="https://www.ebi.ac.uk/chembl/compound_report_card/{{ ev.molecule_chemblid }}">
+      {{ ev.molecule_name }}
+    </a>
+  </li>
+{% endfor %}
+</ul>
