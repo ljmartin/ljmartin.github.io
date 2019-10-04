@@ -1,0 +1,17 @@
+---
+layout: default
+title: Hank Quinlan, Horrible Cop
+---
+<div class="blurb">
+	<h1>Hi there, I'm Hank Quinlan!</h1>
+	<p>I'm best known as the horrible cop from <em>A Touch of Evil</em> Don't trust me. <a href="/about">Read more about my life...</a></p>
+</div><!-- /.blurb -->
+<ul>
+  {% for cb in site.data.cannabinoids %}
+  <li>
+    <a href="https://www.ebi.ac.uk/chembl/compound_report_card/{{ cb.molecule_chemblid }}">
+      {{ cb.molecule_name }}
+    </a>
+  </li>
+{% endfor %}
+</ul>
