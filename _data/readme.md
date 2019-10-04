@@ -1,6 +1,6 @@
 # Explanation
 ## `evidence.csv`
-This contains known evidence for cannabinoid binding.
+This contains known evidence for cannabinoid binding, intended to be used for scoring LBVS models.
 At the moment, only including publicly available data.
 Initial source for data is GuideToPharmacology.
 Later sources include literature search (in particular morales2017 paper).
