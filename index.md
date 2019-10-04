@@ -4,10 +4,8 @@ Update flag3 -You can use the [editor on GitHub](https://github.com/ljmartin/ljm
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-Created a page at [loadData.html](loadData.html)
-Created a page at [test.html](test.html)
 
-Created a page at [test_cbs.html](test_cbs.html)
+Created a page at [See the cannabinoids.html](cannabinoids.html)
 
 
 ### Markdown
