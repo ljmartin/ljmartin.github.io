@@ -7,6 +7,9 @@ Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://j
 
 Created a page at [See the cannabinoids.html](cannabinoids.html)
 
+Note to self:
+[this blog post](http://jmcglone.com/guides/github-pages/) has a simple introductory example
+
 
 ### Markdown
 
