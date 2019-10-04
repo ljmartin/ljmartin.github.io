@@ -1,9 +1,9 @@
 ---
-title: This will be used as the title-tag of the page head
+title: Data loading
 ---
  
-hello
+Data loading
 =====
  
-**You are here!**
+This page is to test the \_data loading feature of jekyll
  
