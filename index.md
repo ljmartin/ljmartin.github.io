@@ -4,7 +4,7 @@ You can use the [editor on GitHub](https://github.com/ljmartin/ljmartin.github.i
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-Created a page at [loading data](https://github.com/ljmartin/ljmartin.github.io/loadData)
+Created a page at [loading data](loadData.html)
 
 ### Markdown
 
