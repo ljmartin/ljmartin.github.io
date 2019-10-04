@@ -9,37 +9,13 @@ Created a page at [See the cannabinoids](cannabinoids.html)
 
 Note to self:
 [this blog post](http://jmcglone.com/guides/github-pages/) has a simple introductory example
+
 Note to self:
 [this blog post](http://joshualande.com/create-tables-sql) has a short intro to creating an SQL table, although I will probably just use long format CSV since the table won't be that big.
 
 
-### Markdown
+---
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/ljmartin/ljmartin.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
 ### Support or Contact
 
