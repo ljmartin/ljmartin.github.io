@@ -9,6 +9,8 @@ Created a page at [See the cannabinoids](cannabinoids.html)
 
 Note to self:
 [this blog post](http://jmcglone.com/guides/github-pages/) has a simple introductory example
+Note to self:
+[this blog post](http://joshualande.com/create-tables-sql) has a short intro to creating an SQL table, although I will probably just use long format CSV since the table won't be that big.
 
 
 ### Markdown
