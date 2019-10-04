@@ -16,13 +16,16 @@ title: this a page
 {% endfor %}
 </ul>
 
-<div markdown="1">
-This is a list:
+<section id="categories" markdown="1">
 
-- Item 1
-- Item 2
-- Item 3
-</div>
+__Markdown__ getting converted to __HTML__ inside a ___block-level element___.
+
+A list of categories:
+
+- foo
+- bar
+
+</section>
 
 <ul>
   {% for ev in site.data.evidence %}
