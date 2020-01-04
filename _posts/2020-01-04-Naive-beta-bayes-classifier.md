@@ -1,9 +1,8 @@
 ---
 layout: default
-title: this a page 
+title: A bayesian naive bayes classifier
 ---
 
 # A bayesian naive bayes classifier
-## (using ligand-based virtual screening as example)
 
-Naive bayes classifiers are commonly-used tools in topic classification of documents 
+Naive bayes classifiers are commonly-used tools in topic classification of documents as well as in 
