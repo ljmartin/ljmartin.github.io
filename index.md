@@ -1,4 +1,4 @@
-# A website
+# ljmartin blog
 
 ## Displaying an index of posts: 
 
