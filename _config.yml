@@ -1,4 +1,6 @@
 title: ljmartin.github.io-updated
+plugins:
+  - jekyll-remote-theme
 #description: placeholder for what will be a website
 #show_downloads: false
 #google_analytics: UA-155552119-1
