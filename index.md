@@ -1,6 +1,6 @@
 # ljmartin blog
 
-## Displaying an index of posts: 
+## Displaying an index of posts bah: 
 
 <ul>
   {% for post in site.posts %}
