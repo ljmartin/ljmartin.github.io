@@ -1,3 +1,5 @@
-theme: jekyll-theme-slate
 title: ljmartin.github.io
 description: placeholder for what will be a website
+show_downloads: true
+google_analytics:
+theme: jekyll-theme-slate
