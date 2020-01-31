@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Interactive filtering of predicted ligands"
 ---
 
@@ -25,12 +25,12 @@ jupyter nbextension enable --py widgetsnbextension
 
 For synthetic accessibility scores, you'll also need `sascorer.py` which is available [here](https://github.com/rdkit/rdkit/tree/master/Contrib/SA_Score)
 
+## What it looks like:
+The interactive parts don't render on this page, but the results look something like this:
+![useful image]({{ site.url }}/assets/filter_example.gif)
 
-If you don't want to install anything or run a notebook, the results look something like this:
-![example](./filter_example.gif)
 
-
-
+## The code:
 
 ```python
 #imports:
