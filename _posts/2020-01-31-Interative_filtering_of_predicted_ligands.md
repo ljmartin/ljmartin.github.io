@@ -16,21 +16,22 @@ There are many techniques to generate a ranked list of molecules having some des
 The list could go on, but basically ranked predictions should be accompanied by some method of filtering. A large-scale example of this is the [Ultra-large library docking for discovering new chemotypes](https://doi.org/10.1038/s41586-019-0917-9). It usually involves some visual inspection by a medicinal chemist or pharmacologist as well as automated filtering. 
 
 
-This page demonstrates how to do this in an interactive way using RDKit and a Jupyter notebook. It uses [ipywidgets](https://ipywidgets.readthedocs.io/en/latest/user_install.html), so if you don't have that then install and enable first:
+This page demonstrates how to do this in an interactive way using RDKit and a Jupyter notebook. 
+
+## What it looks like:
+The interactive parts don't render on this page, but the results look something like this:
+![example](/assets/filter_example.gif)
+
+## The code:
+It all boils down to filtering a pandas dataframe using [ipywidgets](https://ipywidgets.readthedocs.io/en/latest/user_install.html), so if you don't have that then install and enable first:
 
 ```
 pip install ipywidgets
 jupyter nbextension enable --py widgetsnbextension
 ```
 
-For synthetic accessibility scores, you'll also need `sascorer.py` which is available [here](https://github.com/rdkit/rdkit/tree/master/Contrib/SA_Score)
+For synthetic accessibility scores, you'll also need `sascorer.py` and `fpscores.pkl.gz` which is available [here](https://github.com/rdkit/rdkit/tree/master/Contrib/SA_Score)
 
-## What it looks like:
-The interactive parts don't render on this page, but the results look something like this:
-![useful image]({{ site.url }}/assets/filter_example.gif)
-
-
-## The code:
 
 ```python
 #imports:
