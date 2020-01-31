@@ -19,7 +19,7 @@ The list could go on, but basically ranked predictions should be accompanied by 
 This page demonstrates how to do this in an interactive way using RDKit and a Jupyter notebook. 
 
 ## What it looks like:
-The interactive parts don't render on this page, but the results look something like this:
+The interactive parts don't render on this page, but you can see a gif of the results below. You can also download the notebook and example SMILES file in [this repo](https://github.com/ljmartin/interactive_filtering).
 ![example](/assets/filter_example.gif)
 
 ## The code:
@@ -30,9 +30,10 @@ pip install ipywidgets
 jupyter nbextension enable --py widgetsnbextension
 ```
 
-For synthetic accessibility scores, you'll also need `sascorer.py` and `fpscores.pkl.gz` which is available [here](https://github.com/rdkit/rdkit/tree/master/Contrib/SA_Score)
+For synthetic accessibility scores, you'll also need `sascorer.py` and `fpscores.pkl.gz` which are available [here](https://github.com/rdkit/rdkit/tree/master/Contrib/SA_Score)
 
 
+## Setup:
 ```python
 #imports:
 import pandas as pd
@@ -56,7 +57,9 @@ from sklearn.metrics import pairwise_distances
 from sklearn.cluster import AgglomerativeClustering
 ```
 
+
 Here I'm using a random selection of ligands as a stand-in for a real ranked list. I'm also using some randomly selected ligands for the known positives at an imaginary target-of-interest:
+
 
 
 ```python
@@ -217,7 +220,7 @@ predicted.head()
 
 
 
-# Make it interactive
+## Make it interactive
 
 This boils down to building a mask based on your chosen level of the above parameters, which is then used to filter the `predicted` list and return the remaining ranked hits. The function returns the rdkit `Draw.MolsToGridImage` to visualize the remaining molecules. 
 
@@ -250,7 +253,7 @@ def get_top_ligands(similarity=(0.2, 1, 0.01), sa_score=4, qeds=0.25, logp=6, nu
     interactive(children=(FloatSlider(value=0.6000000000000001, description='similarity', max=1.0, min=0.2, step=0…
 
 
-# Bonus - cluster and return only the top-ranked scaffold per cluster
+## Bonus - cluster and return only the top-ranked scaffold per cluster
 
 You don't want the hit list to be full of a single scaffold with different R groups. Better to test multiple scaffolds and increase the probability of discovering a new chemotype. Clustering first, and returning only the top-ranked hit, removes closely-related analogs.
 
