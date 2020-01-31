@@ -20,6 +20,8 @@ This page demonstrates how to do this in an interactive way using RDKit and a Ju
 
 ## What it looks like:
 The interactive parts don't render on this page, but you can see a gif of the results below. You can also download the notebook and example SMILES file in [this repo](https://github.com/ljmartin/interactive_filtering).
+
+
 ![example](/assets/filter_example.gif)
 
 ## The code:
