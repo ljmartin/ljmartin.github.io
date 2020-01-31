@@ -25,12 +25,12 @@ jupyter nbextension enable --py widgetsnbextension
 
 For synthetic accessibility scores, you'll also need `sascorer.py` which is available [here](https://github.com/rdkit/rdkit/tree/master/Contrib/SA_Score)
 
-
+## What it looks like:
 The interactive parts don't render on this page, but the results look something like this:
-![example](/assets/filter_example.gif)
+![useful image]({{ site.url }}/assets/filter_example.gif)
 
 
-
+## The code:
 
 ```python
 #imports:
