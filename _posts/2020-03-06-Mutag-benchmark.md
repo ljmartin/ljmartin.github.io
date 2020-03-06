@@ -101,7 +101,7 @@ Draw.MolsToGridImage(np.random.choice(mols[labels==1], 12, replace=False), molsP
 
 
 
-![png](mutag_bad_files/mutag_bad_8_0.png)
+![png](/assets/mutag_bad_8_0.png)
 
 
 
@@ -115,7 +115,7 @@ Draw.MolsToGridImage(np.random.choice(mols[labels==0], 12, replace=False), molsP
 
 
 
-![png](mutag_bad_files/mutag_bad_10_0.png)
+![png](/assets/mutag_bad_10_0.png)
 
 
 
@@ -159,7 +159,7 @@ plt.xlabel('Number of nodes')
 
 
 
-![png](mutag_bad_files/mutag_bad_13_1.png)
+![png](/assets/mutag_bad_13_1.png)
 
 
 
@@ -181,7 +181,7 @@ plt.grid()
 ```
 
 
-![png](mutag_bad_files/mutag_bad_14_0.png)
+![png](/assets/mutag_bad_14_0.png)
 
 
 
@@ -253,7 +253,7 @@ plt.ylabel('Density')
 
 
 
-![png](mutag_bad_files/mutag_bad_17_1.png)
+![png](/assets/mutag_bad_17_1.png)
 
 
 # Takeaway:
