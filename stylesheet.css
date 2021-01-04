@@ -40,9 +40,10 @@ nav a:hover {
     background: #8f8f8f;/*#069;*/
 }
 
-h2 {
-  margin-top: 1em;
-  padding-top: 1em;
+h1, h2 {
+    margin-top: 0.5em;
+    margin-bottom: 0.25em;
+    padding-top: 1em;
 }
 
 h1,
