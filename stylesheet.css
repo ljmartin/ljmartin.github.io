@@ -19,7 +19,7 @@ nav ul {
     margin: 0;
     padding: 0;
     display: flex;
-    background: #17a;
+    background: #eee;/*#17a;*/
 }
 nav li {
     list-style: none;
@@ -27,7 +27,7 @@ nav li {
 nav li * {
     display: block;
     padding: 0.4rem 0.4rem;
-    color: white;
+    color: #555;
 }
 nav li strong {
     padding-left: 1.5rem;
@@ -37,7 +37,7 @@ nav a {
     text-decoration: none;
 }
 nav a:hover {
-    background: #069;
+    background: #8f8f8f;/*#069;*/
 }
 
 h2 {
