@@ -2,7 +2,7 @@
 body {
     font-family: "Helvetica", "Arial", sans-serif;
     margin: 0 auto;
-    max-width: 48rem;
+    max-width: 52rem;
     line-height: 1.45;
     padding: 0.5rem 0 1.6rem;
     box-shadow: 0 0 2rem 0 #bbb;
@@ -16,7 +16,7 @@ main {
 
 
 nav ul {
-    margin: 0;
+    margin: 1rem;
     padding: 0;
     display: flex;
     background: #eee;/*#17a;*/
