@@ -7,6 +7,7 @@ body {
     padding: 0.5rem 0 1.6rem;
     box-shadow: 0 0 2rem 0 #bbb;
     border-radius: 0 0 0.6rem 0.6rem;
+    color: #555;
 }
 main {
     padding: 0 1.4rem;
@@ -43,3 +44,12 @@ nav a:hover {
     background: #069;
 }
 
+h2 {
+  margin-top: 1em;
+  padding-top: 1em;
+}
+h1,
+h2,
+strong {
+  color: #333;
+}
