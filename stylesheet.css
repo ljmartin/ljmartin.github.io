@@ -9,11 +9,11 @@ body {
     border-radius: 0 0 0.6rem 0.6rem;
     color: #555;
 }
+
 main {
     padding: 0 1.4rem;
     hyphens: auto;
 }
-
 
 nav ul {
     margin: 1rem;
@@ -60,3 +60,7 @@ pre {
 pre {
     border-left: 2px solid #69c;
 }
+
+/*.aligncenter {
+    text-align: center;
+}*/
