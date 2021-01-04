@@ -10,6 +10,7 @@ body {
     color: #555;
 }
 
+
 main {
     padding: 0 1.4rem;
     hyphens: auto;
@@ -36,6 +37,10 @@ nav li strong {
 nav a {
     text-decoration: none;
 }
+nav a:visited {
+    color: #555;
+}
+
 nav a:hover {
     background: #8f8f8f;/*#069;*/
 }
@@ -62,6 +67,10 @@ pre {
     border-left: 2px solid #69c;
 }
 
-/*.aligncenter {
-    text-align: center;
-}*/
+a {
+    color: #1843a1;
+}
+
+a:visited {
+    color: #657fb8;/*#5880d6;*/
+}
