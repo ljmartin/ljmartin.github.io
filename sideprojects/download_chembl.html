@@ -24,7 +24,7 @@
   <a href="https://github.com/ljmartin/download_chembl">Github repo</a><br>
   <p>People often ask "How many / what kinds of ligands are known to hit Protein X?" Answering this involves querying a database of ligand activities like <a href="https://www.ebi.ac.uk/chembl/">ChEMBL</a>, <a href="https://www.bindingdb.org/bind/index.jsp">BindingDB</a>, or <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a>. These offer <code>.csv</code> downloads after a manual search, or large database downloads for doing <code>SQL</code> queries.
 
-  <p>Alternatively it's nice to have an automated approach that can slot into a workflow. I've re-written this code enough times that it's worth writing up as a reference even for myself. The code below queries the ChEMBL server using their web services API and downloads the associated active ligands, where 'activity' is defined by a pchembl value.
+  <p>Alternatively it's nice to have an automated approach that can slot into a workflow. I've re-written this code enough times that it's worth writing up as a reference even for myself. The code below queries the ChEMBL server using their web services API and downloads the associated active ligands, where 'activity' is defined by a pchembl value. It doesn't require installing any uncommon packages and runs in about a minute (depending on the number of ligands), resulting in a pandas dataframe with SMILES codes, pchembl values, and some other ligand properties. 
 
   <p>Just Ctrl-C + Ctrl-V, set the chembl accession code and the pchembl value, and run: 
     
