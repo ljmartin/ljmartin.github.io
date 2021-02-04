@@ -20,7 +20,7 @@
 </nav>
 
 <main>
-  <h1> Post-processing MD trajectories with mdtraj </h1>
+  <h1> Basic trajectory post-processing w/ mdtraj</h1>
 <!--  <a href="https://example.com">Github repo</a><br> -->
 
   <p>The first step in post-processing MD data is - usually! - concatenting  multiple files and centering on a useful molecule, like the protein. This is easy enough to do with <a href="https://mdtraj.org">mdtraj</a> but the code isn't that memorable and it isn't actually put together in the mdtraj examples.
@@ -42,7 +42,7 @@ print('Loading trajectory files')
 for i in range(1,n+1):
     try:
         print(f'loading {i}')
-        traj = md.load_dcd(f' 3PT_{i}_traj.dcd', top='../system_setup/output.psf')
+        traj = md.load_dcd(f'3PTB_{i}_traj.dcd', top='../system_setup/output.psf')
         traj.image_molecules(inplace=True)
         trajs.append(traj)
     except KeyboardInterrupt:
