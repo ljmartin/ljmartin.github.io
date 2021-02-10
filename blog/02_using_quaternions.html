@@ -29,9 +29,9 @@
 
   <p>A reasonable roadmap to implementing a ligand overlay pipeline might look like this:
     <ul>
-      <li>Figure out how to handle molecule rotations using quaternions, which have some advantages over rotation matrices</li>
+      <li>(This post) Figure out how to handle molecule rotations using quaternions, which have some advantages over rotation matrices</li>
       <li>Align molecules by their principal moments of inertia, which is typically close to the global minimum of volume overlap</li>
-      <li>Calculate molecular volume, as well as volume overlaps.. Hard-sphere, Gaussian, or solvent-excluded volumes?</li>
+      <li>Calculate molecular volume, as well as volume overlaps. Hard-sphere, Gaussian, or solvent-excluded volumes?</li>
       <li>Optimize the overlap function between two molecules using gradient-descent or some evolutionary algorithm like CMA-ES</li>
       <li>Validate on some high-throughput screening data or the <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.0c00598">DUD-Z</a> validation set. This approach should also be compared to molecular fingerprits or alignment-free shaped-based descriptors to show improvement</li>
       <li>Optimize timing</li>
