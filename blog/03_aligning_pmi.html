@@ -21,6 +21,7 @@
 
 <main>
   <h1> Ligand overlay 2: aligning principal moments of inertia </h1>
+  <p><a href="./02_using_quaternions.html">See Part 1 - quaternions</a><br>
   <a href="https://github.com/ljmartin/align/blob/main/0.2%20aligning%20principal%20moments%20of%20inertia.ipynb">Notebook on github - Step 2 aligning along PMI</a>
   <center><img src="./pics/monolith.png", width="300"></center>    
   <p>In most docking and ligand-overlay techniques, the loss function is non-convex with many local minima. That means it (might be) inefficient to start from random orientations/translations when searching for the best position. To reduce the search time, for example, UCSF DOCK evaluates ligands at pre-calulated points in the binding site that are likely to hold a ligand atom, assuming that the regions in empty space are unlikely to be even close to optimal. AutoDock-based approaches, including Vina/Smina, appear to use a box-shaped boundary and search across the whole volume. This is a deliberate trade-off - DOCK aims to be fast at the cost of false negatives, while AutoDock aims to identify the best pose for any ligand, at the cost of speed.
