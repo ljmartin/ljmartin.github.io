@@ -33,11 +33,20 @@
     like internal strain, overlap with a co-crystallized ligand, or nice interactions with the binding site.</p>
 
   <p>Computational chemists, as we are wont to do, automate everything in a quest to save time and money. It's hard to automate decades of experience (and it's up in the air whether that can even be done) but we try anyway.
-    Interaction Fingerprints (IFP) are one way to do this. In machine learning parlance an IFP is a multi-hot encoding of the protein-ligand interactions. In normal language, an IFP is a list that records the presence or absence of all the intermolecular bonds between a protein and a ligand, e.g. hydrogen-bond, pi-pi stacking, or salt-bridge.</p>
+    Interaction Fingerprints (IFP) are one way to do this. In machine learning parlance an IFP is a multi-hot encoding of the protein-ligand interactions. In normal language, an IFP is a list that records the presence or absence of all the intermolecular bonds between each residue in a protein and a bound ligand, e.g. hydrogen-bonds, pi-pi stacking, or salt-bridges.</p>
 
   <p>IFPs are topical thanks to a <a href="https://doi.org/10.1021/acs.jcim.1c00292">a recent paper</a> showing that matching the IFP of the co-crystallized ligand outperforms much more sophisticated re-scoring methods. For my money, I think this says less about docking than it does about structural biology - ligands need to bind a 'pre-organized' binding site, and by matching the IFP then you ensure the binding mode matches the organization of the site.</p>
 
-  <p>There's <a href="https://doi.org/10.1021/jm030331x">quite</a> a <a href="https://doi.org/10.1021/acs.jcim.0c00305">few</a> different <a href="https://prolif.readthedocs.io/en/latest/">approaches</a> out there to <a href="https://plip-tool.biotec.tu-dresden.de/plip-web/plip/index">calculate</a> interactions <a href="http://biosig.unimelb.edu.au/arpeggioweb/">using</a> rules-based approaches. They're all great. Here's one approach, using PLIP, to transform such interactions into a fingerprint. The example protein here is streptavidin, bound to biotin. In practice it takes some finessing to scale this up to lots of ligands, but once that's done then these fingerprints fit nicely into the <a href="../sideprojects/sparsefp.html">sparse jaccard similarity calculations</a> workflow.</p>  
+  <p>There's <a href="https://doi.org/10.1021/jm030331x">quite</a> a <a href="https://doi.org/10.1021/acs.jcim.0c00305">few</a> different <a href="https://prolif.readthedocs.io/en/latest/">approaches</a> out there to <a href="https://plip-tool.biotec.tu-dresden.de/plip-web/plip/index">calculate</a> interactions <a href="http://biosig.unimelb.edu.au/arpeggioweb/">using</a> rules-based approaches. They're all great. Here's one approach, using PLIP, to transform such interactions into a fingerprint. The example protein here is streptavidin, bound to biotin. In practice it takes some finessing to scale this up to lots of ligands, but once that's done then these fingerprints fit nicely into the <a href="../sideprojects/sparsefp.html">sparse jaccard similarity calculations</a> workflow.</p>
+
+  <p>If the code below doesn't make sense, here's a primer on how this works. You'll need Prody, PLIP, as well as scipy/numpy.<br/>
+  &mdash; Load and prepare a protein:ligand complex with prody<br/>
+  &mdash; Load this complex with PLIP, generating a 'binding site report'<br/>
+  &mdash; Set up an empty array of size (n_residues, n_interaction_types)<br/>
+  &mdash; For each residue - interaction combination present, set the corresponding entry in that array to '1'<br/>
+  &mdash; Flatten the array to result in a shape (1, n_residues * n_interaction_types) fingerprint<br/>
+
+    <p>Because the IFP records interactions with every possible residue, it will work to compare ligands bound in any position. Of course, this means you won't be able to compare fingerprints across proteins with different residues, but that's not what IFPs are for. 
 
   <pre>
       <code>
@@ -48,7 +57,7 @@ import prody
 prody.confProDy(verbosity='none')
 import numpy as np
 from scipy import sparse
-import mdtraj as md
+
 #set some slightly looser configs:
 #this gives a bit more of a detailed picture. 
 pconfig.PISTACK_OFFSET_MAX = 3.0
@@ -78,9 +87,6 @@ for key, value in my_mol.interaction_sets.items():
 #make a report about this binding site:
 bsr = BindingSiteReport(intrxn)
 
-#make a report about this binding site:
-bsr = BindingSiteReport(intrxn)
-
 
 # this function just makes a list of the unique resIDs
 unique = lambda x: list(set(x))
@@ -107,12 +113,14 @@ for count, interaction_type in enumerate(interactions):
         fp[resid, count]=1
         
         
-# finally, the fingerprint is saved as a sparse, flat version:
+# finally, the fingerprint is recorded as a sparse, flat version,
+# which is amenable to easy Jaccard similarity calculations::
 fp = sparse.csr_matrix(fp.flatten())
 fp
       </code>
   </pre>
 
+  Output:
   <pre>
     <code>
       <1x2152 sparse matrix of type numpy.int64
@@ -121,7 +129,4 @@ fp
   </pre>
   
     
-
-    <center><img src="./pic", width="300"></center>
-
    
