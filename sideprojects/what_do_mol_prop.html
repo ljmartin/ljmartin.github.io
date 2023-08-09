@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> What do molecular properties look like? </h1>
+  <a href="https://github.com/ljmartin/what_do_mol_prop_look_like">Github repo</a><br>
+  <a href="https://share.streamlit.io/ljmartin/what_do_mol_prop_look_like/main/stApp.py">View the app</a><br>
+  <p>Screening library design (virtual or IRL) requires multiple decisions that affect the cost, time, and eventual success of a screening campaign. For example - should PAINS compounds be included or filtered out beforehand? What about Brenk filtering to remove molecules more likely to be toxic? Positively charged compounds have higher risk of hERG inhibition, but might be desirable for a negatively-charged binding site, leading to a balancing act. In general, harsher filters reduce the downside risk of initial hits being bad drugs, but might reject some good drugs too (<a href="https://xkcd.com/2395/">source</a>):
+
+    <center><img src="./screening_risk.png", width="300"></center>
+
+  <p>The starting point for filtering is arguably logP (hydrophobicity) and molecular weight (size). Too large and too 'greasy' makes for an unlikely drug (with the exception of natural products). To help get an intuitive feel for these properties to complement the empirical rules in the literature, I built a tool to visualize molecules falling within a MW and LogP range.
+
+  <p>It uses a free server provided by <code>streamlit</code> and <code>RDKit</code> to calculate properties and visualize molecules. These two packages make a great combination and would be ideal to publish machine learning models as well as tools like this. Check it out and if you want to see different properties just leave a comment on the github!
+
+    <center><img src="https://raw.githubusercontent.com/ljmartin/what_do_mol_prop_look_like/main/scrnshot.png", width="350"></center>
+

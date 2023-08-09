@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2022-03-29">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+
+	    <meta name="twitter:card" content="summary"></meta>
+	    <meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Bayesian IC50 fits"></meta>
+        <meta name="twitter:description" content="Estimating range of probable values with PyMC3"></meta>
+
+
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Bayesian IC50 fits </h1>
+  <p><a href="https://gist.github.com/ljmartin/b1567d48424975a7d3513df16e8d7503">Notebook gist</a><br>
+
+  <p>Concentration-response curve are fit to data points to determine an IC50 value for an inhibitor (or EC50 for agonists). Often there's scant information on how the fit was generated - in publications or from CROs. The settings of the fits can make a huge difference. For instance, I have observed fits where the highest inhibition value appears to fly off to infinity, in an assay system where it should not. In most cases, we know beforehand whereabouts the maximal inhibition <i>should</i> be.
+
+  <p>Clever construction of a frequentist curve-fit could avoid this but it's also the perfect setting for a Bayesian fit, allowing one to encode reasonable priors beforehand. This setting also allows one to visualize uncertainty in flexible and intuitive ways, and easily query things like the probability that the IC50 is greater than X. Finally, fitting the curve yourself is just a great exercise since it forces you to define all the assumptions, and it's just easier to fit complex curves with Bayesian methods.
+
+  <p>The gist below demonstrates how to use PyMC3 to fit some inhibition data to estimate a CRC. It shows how to query the fit to show the uncertainty in the estimated IC50 - often this is a lot bigger than you might expect from the single estimate in an automatically generated report! Finally it demonstrates a spaghetti plot, which is a lovely way to visualize how the uncertainty in the parameters effects the ultimate curve. 
+
+<script src="https://gist.github.com/ljmartin/b1567d48424975a7d3513df16e8d7503.js"></script>  
+

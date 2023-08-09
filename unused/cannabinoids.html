@@ -1,0 +1,39 @@
+---
+layout: default
+title: this a page 
+---
+<div class="blurb">
+	<h1>Cannabinoids landing page</h1>
+	<p>This is supposed to be where you select a CB</p>
+</div><!-- /.blurb -->
+<ul>
+  {% for cb in site.data.cannabinoids %}
+  <li>
+    <a href="https://www.ebi.ac.uk/chembl/compound_report_card/{{ cb.molecule_chemblid }}">
+      {{ cb.molecule_name }}
+    </a>
+  </li>
+{% endfor %}
+</ul>
+
+<section id="categories" markdown="1">
+
+__Markdown__ getting converted to __HTML__ inside a ___block-level element___.
+
+A list of categories:
+
+- foo
+- bar
+
+</section>
+
+<ul>
+  {% for ev in site.data.evidence %}
+  <li>
+    <a href="https://www.ebi.ac.uk/chembl/compound_report_card/{{ ev.molecule_chemblid }}">
+      {{ ev.molecule_name }}
+	</a>
+	  Testing some text
+  </li>
+{% endfor %}
+</ul>

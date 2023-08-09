@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+
+	<!-- twitter card:-->
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@lewischewis" />
+        <meta name="twitter:title" content="Make IFPs with PLIP" />
+        <meta name="twitter:description" content="IFP=Interaction FingerPrint" />
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Make an interaction fingerprint with PLIP </h1>
+  
+
+  <p>Docking should always be accompanied by some kind of manual check. Typically this is achieved by holding a <a href="https://doi.org/10.1021/acs.jmedchem.0c02227">Hit Picking Party</a>, checking for things
+    like internal strain, overlap with a co-crystallized ligand, or nice interactions with the binding site.</p>
+
+  <p>Computational chemists, as we are wont to do, automate everything in a quest to save time and money. It's hard to automate decades of experience (and it's up in the air whether that can even be done) but we try anyway.
+    Interaction Fingerprints (IFP) are one way to do this. In machine learning parlance an IFP is a multi-hot encoding of the protein-ligand interactions. In normal language, an IFP is a list that records the presence or absence of all the intermolecular bonds between each residue in a protein and a bound ligand, e.g. hydrogen-bonds, pi-pi stacking, or salt-bridges.</p>
+
+  <p>IFPs are topical thanks to a <a href="https://doi.org/10.1021/acs.jcim.1c00292">a recent paper</a> showing that matching the IFP of the co-crystallized ligand outperforms much more sophisticated re-scoring methods. For my money, I think this says less about docking than it does about structural biology - ligands need to bind a 'pre-organized' binding site, and by matching the IFP then you ensure the binding mode matches the organization of the site.</p>
+
+  <p>There's <a href="https://doi.org/10.1021/jm030331x">quite</a> a <a href="https://doi.org/10.1021/acs.jcim.0c00305">few</a> different <a href="https://prolif.readthedocs.io/en/latest/">approaches</a> out there to <a href="https://plip-tool.biotec.tu-dresden.de/plip-web/plip/index">calculate</a> interactions <a href="http://biosig.unimelb.edu.au/arpeggioweb/">using</a> rules-based approaches. They're all great. Here's one approach, using PLIP, to transform such interactions into a fingerprint. The example protein here is streptavidin, bound to biotin. In practice it takes some finessing to scale this up to lots of ligands, but once that's done then these fingerprints fit nicely into the <a href="../sideprojects/sparsefp.html">sparse jaccard similarity calculations</a> workflow.</p>
+
+  <p>If the code below doesn't make sense, here's a primer on how this works. You'll need Prody, PLIP, as well as scipy/numpy.<br/>
+  &mdash; Load and prepare a protein:ligand complex with prody<br/>
+  &mdash; Load this complex with PLIP, generating a 'binding site report'<br/>
+  &mdash; Set up an empty array of size (n_residues, n_interaction_types)<br/>
+  &mdash; For each residue - interaction combination present, set the corresponding entry in that array to '1'<br/>
+  &mdash; Flatten the array to result in a shape (1, n_residues * n_interaction_types) fingerprint<br/>
+
+    <p>Because the IFP records interactions with every possible residue, it will work to compare ligands bound in any position. Of course, this means you won't be able to compare fingerprints across proteins with different residues, but that's not what IFPs are for. 
+
+  <pre>
+      <code>
+from plip.structure.preparation import PDBComplex
+from plip.exchange.report import BindingSiteReport
+from plip.basic import config as pconfig
+import prody
+prody.confProDy(verbosity='none')
+import numpy as np
+from scipy import sparse
+
+#set some slightly looser configs:
+#this gives a bit more of a detailed picture. 
+pconfig.PISTACK_OFFSET_MAX = 3.0
+pconfig.HYDROPH_DIST_MAX = 5
+
+# get chain A of an example protein:ligand complex.
+# this is an obvious one - streptavidin:biotin
+# save as a pdb to load with plip
+pdbid = '3ry2'
+
+chA = prody.parsePDB(pdbid, chain='A',verbose=False)
+prody.writePDB('temp.pdb', chA)
+
+
+#load the pdb with plip,
+my_mol = PDBComplex()
+my_mol.load_pdb('./temp.pdb') # Load the PDB file into PLIP class
+# we already know the ligand name is BTN
+ligname = 'BTN'
+# there could be multiple interactions with other ligands in some proteins.
+# only take the relevant co-crystallized ligand.
+my_mol.analyze()
+for key, value in my_mol.interaction_sets.items():
+    if ligname in key:
+        intrxn = value
+        
+#make a report about this binding site:
+bsr = BindingSiteReport(intrxn)
+
+
+# this function just makes a list of the unique resIDs
+unique = lambda x: list(set(x))
+residue_IDs = unique([at.residue.idx for at in my_mol.atoms.values()])
+
+# define a set of interactions that might be fingerprint-worthy (its everything PLIP has)
+interactions = [bsr.halogen_info, bsr.pication_info,
+                                  bsr.hbond_info, bsr.saltbridge_info,
+                                  bsr.waterbridge_info, bsr.pistacking_info, 
+                                  bsr.metal_info, bsr.hydrophobic_info
+                                 ]
+
+
+# this is where the magic happens:
+# make an empty fingerprint
+fp = np.zeros(shape=(len(residue_IDs), len(interactions))).astype(int)
+# for each interaction type,
+for count, interaction_type in enumerate(interactions):
+    # for each example of that interaction
+    for interaction in interaction_type:
+        #take the residue ID
+        resid = interaction[0]
+        #set the bit to ON
+        fp[resid, count]=1
+        
+        
+# finally, the fingerprint is recorded as a sparse, flat version,
+# which is amenable to easy Jaccard similarity calculations::
+fp = sparse.csr_matrix(fp.flatten())
+fp
+      </code>
+  </pre>
+
+  Output:
+  <pre>
+    <code>
+      <1x2152 sparse matrix of type numpy.int64
+	      with 13 stored elements in Compressed Sparse Row format>
+    </code>
+  </pre>
+  
+    
+   

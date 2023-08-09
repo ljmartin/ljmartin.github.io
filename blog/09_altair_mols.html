@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2022-02-16">
+
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+
+	<meta name="twitter:card" content="summary"></meta>
+	<meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="RDKit Mols in altair"></meta>
+        <meta name="twitter:description" content="Adding mol pics as tooltips to scatterplots"></meta>
+
+	<!-- Import Vega & Vega-Lite (does not have to be from CDN) -->
+	<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vega-lite@4"></script>
+	<!-- Import vega-embed -->
+	<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> RDKit Mols in altair plots </h1>
+  <p><a href="https://github.com/ljmartin/altair_mols">Repo</a><br>
+  <a href="https://github.com/ljmartin/altair_mols/blob/main/altair_plot_mols.ipynb">Notebook</a><br>
+  <p>I recently came across a great looking library called <a href="https://github.com/wjm41/molplotly">molplotly</a>. It uses plotly to show small pictures (aka tooltips) of the molecule associated with a scatterplot point on mouse-over. Along with <a href="https://github.com/cbouy/mols2grid">mols2grid</a>, it's a great way to parse data or share it collaboratively to an audience.
+
+    <p>Below I demonstrate an alternative using <a href="https://altair-viz.github.io/">altair</a>. Altair visualizations look great, although there's a steep learning curve unless you're already familiar with the 'grammar of graphics' a la ggplot. There's a bit of tinkering to set up each plot, but at the same time there's a lot of freedom to customize each visualization as shown below.  
+
+    <p>The notebook uses a sample of drug-like ligands from the RCSB Ligand Expo with clogp, molwt, and tpsa values along with some fake potency data. The main trick to get image tooltips is to add a column to the input dataframe that specifies a URL path to each ligand's image file (which have to be generated beforehand). Beware that in notebooks, the image path will be relative to the notebook server rather than the filesystem.
+
+      <h3>Scatter plot of MolWt. vs cLogP</h3>
+      Below demonstrates plotting three dimensions (molwt, clogp, and potency as colour) along with tooltips, which appear on a mouse-over. <br> 
+<div id="vis1"></div>
+<script type="text/javascript">
+  var spec = "https://raw.githubusercontent.com/ljmartin/altair_mols/master/scatterplot.json";
+  vegaEmbed('#vis1', spec).then(function(result) {
+    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+  }).catch(console.error);
+</script>
+  
+<h3>Horizontal scatterplot with molecules in yaxis labels</h3>
+Below demonstrates the ability to encode two types of images: one in the y-axis labels, and a different one in the tooltips. This might be useful for comparing two sets of molecules or, alternatively, putting 2D structures in the axis and 3D structures of binding modes in the tooltip.<br>
+<div id="vis2"></div>
+<script type="text/javascript">
+  var spec = "https://raw.githubusercontent.com/ljmartin/altair_mols/master/ylabels.json";
+  vegaEmbed('#vis2', spec).then(function(result) {
+    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+  }).catch(console.error);
+</script>
+  
+ 

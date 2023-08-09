@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2023-01-13">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	    <meta name="twitter:card" content="summary" />
+	    <meta name="twitter:site" content="@lewischewis" />
+        <meta name="twitter:title" content="Storing mols in parquet files" />
+        <meta name="twitter:description" content="A trick for large SDFs" />
+
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Storing mols in parquet files </h1>
+  <p>
+    SDF is a common and handy format for modelling molecular properties or protein-ligand interactions. Nevertheless, after scaling up to millions of compounds, they become unwieldy: Firstly, the file sizes get large. This is resolved easily using gzip. But secondly, loading millions of molecules - locally - into RDKit via SDF takes a long time and a lot of RAM. I frequently spilled over into swap space before using the approach below, and loading up an old project just to check a single thing used to require a brew-a-cup-of-coffee-sized wait, while now it takes seconds.
+
+  <p> Parquet (par-kay) files are a great alternative to store SDF data - you can load them (fast) with pandas, query any other column data with duckdb, and they're small. They take up less RAM, but the compound data (SDF) can quickly be turned back into Chem.Mol objects. Because they're handled by pandas, you can use it as random-access object unlike a gzipped SDF. This makes the most difference when you only care about a small fraction of the compounds at a time, which is the case in many large-scale compchem settings.
+
+    <p>Fitting an SDF into a pandas column is a bit hacky but it just works in practice:
+    
+    <pre>
+      <code>
+import pandas as pd
+import zlib
+from rdkit import Chem
+
+## how to save
+mols = ... #some list of RDKit mols
+sdfs = [zlib.compress(Chem.MolToMolBlock(mol).encode('utf-8')) for mol in mols]
+scores = [m.GetProp('myScore') for m in mols]
+df = pd.DataFrame({
+    'names':[m.GetProp("_Name") for m in ms],
+    'score':scores,
+    'sdfs':sdfs
+})
+df.to_parquet('./df.parquet')
+
+## how to load:
+df = pd.read_parquet('./df.parquet')
+
+# we only need to turn a subset of compounds into Chem.Mol objects:
+sel = df.nlargest(500, 'score')
+mols = [Chem.MolFromMolBlock(zlib.decompress(sdf)) for sdf in sel['sdfs']]
+# do stuff with them...
+
+      </code>        
+    </pre>
+

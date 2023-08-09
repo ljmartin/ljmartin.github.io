@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2022-10-11">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"></meta>
+	    <meta name="twitter:card" content="summary"></meta>
+	    <meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Visualizing crystal contacts"></meta>
+        <meta name="twitter:description" content="on KRAS using PDBe-Molstar"></meta>
+    <link rel="stylesheet" type="text/css" href="https://www.ebi.ac.uk/pdbe/pdb-component-library/css/pdbe-molstar-3.0.0.css">
+    <script type="text/javascript" src="https://www.ebi.ac.uk/pdbe/pdb-component-library/js/pdbe-molstar-plugin-3.0.0.js"></script>
+    <style>
+      #myViewer{
+        float:middle;
+        width:500px;
+        height: 500px;
+        position:relative;
+      }
+    </style>
+
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Visualizing crystal contacts with PDBe-Molstar</h1>
+  <p>A great gotcha in structure-based hit discovery is when a binding site or bound ligand is affected by crystal contacts. Crystal contacts here refers to  adjacent protein molecules contacting each other in the crystal used for X-ray crystallography in a way that would not happen in solution. While having some contacts is normal, they become problematic when they distort the ligand or surrounding protein.
+
+  <p>For example, take <a href="https://www.rcsb.org/3d-view/6GJ7?preset=ligandInteraction&label_asym_id=D">a look at the binding mode of BI-2852</a>, a KRAS inhibitor that came out of a fragment screen. Interestingly, this arose from a 2 <em>milliMolar</em>, fragment. It was optimized to a sub-microMolar binder, despite not making many more protein contacts. Half of it is barely hanging on to the protein yet, for some reason, it is stable in this position as judged by it's <a href="https://files.rcsb.org/pub/pdb/validation_reports/gj/6gj7/6gj7_full_validation.pdf#page=13">well-resolved density</a> (per the validation report on RCSB).
+
+  <p>This odd ligand behaviour is a candidate for crystal contact interference. We can use <a href="https://github.com/molstar/pdbe-molstar">PDBe-Molstar</a>, a convenient protein+ligand visualization tool, to see these. The key line is setting the option <code>defaultPreset</code> to <code>'unitcell'</code> - see an example below and inspect the source of this page to see how that works. You'll notice that the BI-2852 molecules sit snugly between two copies of KRAS, explaining the stability of the <em>apparently</em> solvent-exposed groups. Click one of the intercalating ligands and you'll see that about 50% of the buried surface area is in an adjacent protein unit.
+
+    <h4>Visualization:</h4>
+  <div id="myViewer"></div>
+  <script>
+
+      //Create plugin instance
+      var viewerInstance = new PDBeMolstarPlugin();
+
+      //Set options (Checkout available options list in the documentation)
+      var options = {
+        moleculeId: '6gj7',
+          hideControls: true,
+        bgColor: {r:255, g:255, b:255},
+        defaultPreset: 'unitcell'
+
+      }
+
+      //Get element from HTML/Template to place the viewer
+      var viewerContainer = document.getElementById('myViewer');
+
+      //Call render method to display the 3D view
+      viewerInstance.render(viewerContainer, options);
+
+  </script>
+
+  <p>It's arguable whether the crystal contacts are relevant in this case. Indeed some researchers <a href="https://www.pnas.org/doi/10.1073/pnas.1918164117">argue they are</a> - and the BI folks <a href="https://www.pnas.org/doi/abs/10.1073/pnas.1921236117">argue they aren't</a>! Having a tool to visualize these at least helps one to make a judgement themselves.
+
+    <p><b>Alternatives:</b> I often just open a <a href="https://embed.plnkr.co/plunk/094fAnyWsuQVtYja">pdbe-molstar plunker</a>, change the pdb code, and add <code>defaultCell: 'unitPreset'</code>. That isn't secure, and requires internet. <a href="https://pymolwiki.org/index.php/Symexp">PyMol has</a> a <code>symexp</code> command if you can bare to use it, and <a href="https://www.cgl.ucsf.edu/chimerax/docs/user/tools/crystalcontacts.html">ChimeraX has</a> a crystal contacts tool as well, but the resulting visualization can churn through CPU.  

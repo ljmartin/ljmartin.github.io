@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2022-01-10">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+
+	<meta name="twitter:card" content="summary"></meta>
+	<meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Tree trunk molecules"></meta>
+        <meta name="twitter:description" content="Generating anonymized scaffolds" ></meta>
+	<meta name="twitter:image" content="https://ljmartin.github.io/data/tree_trunk.png"></meta>
+	<meta name="twitter:image:alt" content="Four molecules showing successive anonymization"></meta>
+
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Tree trunk molecules </h1>
+  There are (at least) two reasons one might want to coarse-grain a molecular structure:<br/><br/>
+
+  1) &mdash; Interested parties often wish to know the structure before judging whether it's worth pursuing. Showing an image of the structure is enough to give away the secret.  If it is patented then it's already public knowledge - if it's <i>not</i> patented, showing a picture without coarse-grainig is almost equivalent to giving it away.<br/>
+  2) &mdash; Scaffold analysis requires some automated definition of 'scaffold', which typically means removing 'cabbage' such as terminal atoms, and could include removing atom type and bond order.</p>
+
+  The first reason is described on <a href="https://www.eyesopen.com/ants-rants/passing-of-andrew-grant">Ant's Rants, discussing Andrew Grant's use of Gaussians</a> fit to molecules:
+
+  <blockquote>The best use we ever envisioned, and actually published upon, was as an anonymization technique: i.e., you could obscure what the underlying molecular structure was but keep the shape. I hope this, or some other use, one day catches on as I know it was Andy’s favorite piece of work.</blockquote>
+
+  The second reason is demonstrated by <a href="https://doi.org/10.1021/acs.joc.9b02111">Lipkus et al. from CAS</a>:
+
+  <blockquote>The diversity is characterized using the framework content of the compounds; the framework of a molecule is the scaffold consisting of all its ring systems and all the chain fragments connecting them.</blockquote>
+
+  This code performs the second (FYI the first can be achieved with <a href="https://pdbj.org/gmfit/">GMMFit</a>), but could be used for both. The full molecule can be thought of as a Christmas tree with all the decorations. Successively removing the decorations - yielding Murcko - then the leaves - yielding Generic Murcko - and all the branches results in just the tree trunk, aka framework aka anonymized scaffold:
+
+  <script src="https://gist.github.com/ljmartin/906f0ebb9a5f76aa856286242cbd128e.js"></script>
+
+  
+ 

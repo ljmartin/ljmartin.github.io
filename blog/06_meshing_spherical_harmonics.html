@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2021-12-02">
+
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+
+	<meta name="twitter:card" content="summary"></meta>
+        <meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Meshing spherical harmonics"></meta>
+        <meta name="twitter:description" content="calculating isosurfaces of spherical harmonic functions"></meta>
+
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Meshing spherical harmonics </h1>
+  <p><a href="https://github.com/ljmartin/meshing_stuff">Repo</a><br>
+    <a href="https://github.com/ljmartin/meshing_stuff/blob/main/spherical_harmonics/mesh_spherical_harmonics.ipynb">Notebook</a></br>
+  <p>Spherical harmonics seem to be in vogue in biophysical modeling recently, so I set out for an intuitive understanding of what they are. They aren't easily plotted in 2d, since they are defined on the unit sphere. Matplotlib and mayavi can plot isosurfaces, but as an exercise I take a more hands-on approach rather than just calling a function.
+
+  <p>Scipy can <a href='https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.sph_harm.html'>evaluate a spherical harmonic</a>, of a given order and degree, for a given azimuth and altitude. This results in a spherical heat-map, i.e. positive and negative values defined on the surface of the unit sphere. To turn this into an iso-surface the notebook linked above evaluates the function using the angular coordinates of every grid point in a cube, then compares the spherical harmonic value of each point to the point's actual distance from the origin. This defines a signed distance function (SDF), which can then be meshed with <a href="http://paulbourke.net/geometry/polygonise/">marching cubes</a> after converting from spherical coordinates back into grid coordinates, then back into universe coordinates.
+
+   <p>Incidentally I figured out that <a href="https://skoch9.github.io/meshplot/tutorial/">meshplot</a> can write meshes to .html, which can be saved on github and published via github pages such that they can be embedded in a webstite as an html object, like so (try moving it around!):
+
+    <object data="https://ljmartin.github.io/meshing_stuff/spherical_harmonics/spherical_harmonics.html" width="100%" height="600"></object>
+
+  
+ 

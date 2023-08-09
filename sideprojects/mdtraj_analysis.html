@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Basic trajectory post-processing w mdtraj</h1>
+
+  <p>The first step in post-processing MD data is - usually! - concatenting  multiple files and centering on a useful molecule, like the protein. This is easy enough to do with <a href="https://mdtraj.org">mdtraj</a> but the code isn't that memorable and it isn't actually put together in the mdtraj examples.
+
+  <p>The following loads a series of trajectory files (<code>.dcd</code> here, with <code>.psf</code> as the topology, but swap in other formats as required), then centers all frames on the protein. Following this are some optional steps like removing waters (saves space) and aligning on the protein by minimizing the RMSD.
+
+  <p>Usage is <code>python join.py 20</code> for 20 numbered dcd files. 
+    
+    <pre>
+      <code>
+import mdtraj as md
+import sys
+
+n = int(sys.argv[1])
+
+trajs = list()
+
+print('Loading trajectory files')
+for i in range(1,n+1):
+    try:
+        print(f'loading {i}')
+        traj = md.load_dcd(f'3PTB_{i}_traj.dcd', top='../system_setup/output.psf')
+        traj.image_molecules(inplace=True)
+        trajs.append(traj)
+    except KeyboardInterrupt:
+        raise
+    except Exception as e:
+        raise
+
+print('Loaded, concatenating')
+mtraj = md.join(trajs)
+
+##Optional: remove waters, ions, and lipid.
+mtraj = mtraj.atom_slice(traj.top.select('not resname HOH POPC CL NA'))
+mtraj[0].save('protein.pdb')
+
+print('Concatenated. Now aligning on protein')
+prot = mtraj.top.select('protein')
+mtraj.superpose(mtraj[0], atom_indices=prot)
+print('Done, saving')
+
+
+mtraj.save('joined.dcd')
+      </code>
+    </pre>

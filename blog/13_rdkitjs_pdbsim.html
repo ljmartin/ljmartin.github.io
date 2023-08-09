@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2023-02-20">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"></meta>
+	    <meta name="twitter:card" content="summary"></meta>
+	    <meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="PDB Similarity w RDKitJS"></meta>
+        <meta name="twitter:description" content="A trick for large SDFs"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> PDB Similarity with RDKitJS </h1>
+  <a href="https://ljmartin.github.io/rdkitjs_pdbsim.html">Link to the Javascript tool</a>
+  <p>
+    Working with hits that have no crystal structure, one often wonders whether the proposed binding mode is accurate. Having a good understanding of this helps facilitate the analoguing phase. While the analogue SAR can inform on the binding mode, one way to build supporting evidence beforehand is comparison to existing PDB ligand structures.
+
+  <p>
+    The RCSB does have an input field for SMILES (<code>Advanced Search > Chemical Similarity</code>, then <code>Query Type = Descriptor</code>), but I find it sometimes returns nothing - perhaps there is some unknown threshold. Doing the same in rdkit/python, where every parameter is controllable, is something I do often. Nevertheless, it's still a pain loading up a notebook every time.
+
+    <p>
+      Recently, <a href="https://github.com/rdkit/rdkit-js">RDKitJS</a> has had a lot of improvements, and it's perfect for a web-based tool that can be accessed quickly. As a project to learn Javascript, I wrote an app (?) that takes a query SMILES, fingerprints all the ligands from the PDB (with mol.wt. 200-550), and returns a list, ordered by similarity to the query, along with pictures. The list is formatted by <a href="https://datatables.net/">datatables</a>. As an aside, it's a lot of fun to browse the different javascript spreadsheet options at <a href="https://jspreadsheets.com/">jspreadsheets</a>.
+
+      <p>Technically it works on iOS, but it doesn't look correct. And please note that it still takes 15-20 seconds to featurize all the PDB molecules :) otherwise, it's just like the python equivalent. 
+
+        <a href="https://ljmartin.github.io/rdkitjs_pdbsim.html">Use the tool here.</a>
+
+        <hr>
+
+        <b>PostScript for javascript newbies like me:</b>
+
+        Just inspect the JS to see how it's all done, but don't expect anything pretty! There were three components that had to be figured out: 
+
+      <p>1: Reading a CSV file of names and SMILES. I used ChatGPT here. I'm not even sure what the xml http request does, but it seems pretty general - it just loads data that comes from a file rather than being  present in the js or html of the page.
+      <p>2: Using RDKitJS to fingerprint molecules into a 'dataframe'. This is done by creating an array of arrays, splitting each row and appending (smiles, name, fp) triplets. The RDKitJS function for fingerprinting is  demonstrated in <a href="https://github.com/eloyfelix/rdkitjs_onnx_multitask">this chembl blog code</a>, but note that it's deprecated and now takes parameters supplied as a JSON string. Storing this array separately from the fingerprinting code means the FPs only need to be calculated once.
+
+      <p>3: Calculating similarities and showing a table. This was the most involved. ChatGPT gave an incorrect function to calculate Tanimoto similarity, but it was close enough to figure it out. I could not figure out a way to use sparse fingerprints, but there is a way (<a href="https://github.com/rdkit/rdkit/issues/4329">see datagrok</a>). I also wanted the datatables object to be refreshable, but once it's rendered on the page it won't re-render straightforwardly. To do that, you'll see that the app first instantiates a table with an empty data array. At the point of requesting similarities, this table is deleted and a new table is populated that contains the similarities to whatever query SMILES is in the text field at that time.
+
+        <p>
+        The grid of molecules at the end is a hack - I don't think there's a <code>MolsToGridImage</code> in RDKitJS yet. But I could re-use the drawing function used at the top of the page, adding an <code>inline</code> option that specifies a <code>class='column'</code> tag in the relevant div, along with some css in the header, which emulates a grid. 

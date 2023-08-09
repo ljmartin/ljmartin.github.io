@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Save time and space with sparse molecular fingerprints </h1>
+  <a href="https://github.com/ljmartin/ljmartin.github.io/blob/840e95f06a697abb33780e9d3ffe045e1b0368dd/notebooks/sparse_fp.ipynb">See the notebook for a demo on 10k SMILES from Enamine</a><br>
+
+  <p>With the recent explosion in the number of purchasable molecules, it's become increasingly important to handle large datasets efficiently in both disk space and time. One way to do this is the use of sparse matrices. Since I use python, and scipy has a great module for 2D-sparse matrices, I now process all molecular fingerprints into <code>scipy.sparse.csr_matrix</code>. See the notebook or below for code to do this, which I regularly copy-paste into new projects so feel free to do the same. </p>
+
+  <p>What are the advantages of sparse matrices for fingerprints?</p>
+
+  <p><b>Speed</b> - Dice, Tanimoto, and Jaccard similarity are all based on <a href="https://en.wikipedia.org/wiki/Set_(mathematics)#Basic_operations">set operations</a>, like <code>intersection</code>, <code>union</code>, or <code>cardinality</code>. Thinking of a Morgan fingerprint as a 'bag of molecular substructures' - we can then ignore all the substructures that are <b>not</b> present, and only operate on those that are. That's the beauty of sparse matrices - all the zeros are ignored, making some linear algebra operations (i.e. the sparse matrix-sparse matrix dot product) a lot faster.</p>
+
+  <p>For instance, the pairwise intersection matrix of two sets of fingerprints is the dot-product of their sparse matrices. I explored this a little bit in <a href="https://doi.org/10.1021/acs.jcim.0c00469">doi</a>, but you can see the notebook for a demonstration. In a rough comparison, scipy.sparse gets about <b>50</b> ns per similarity for a size 65,528 Morgan fingerprint, whereas chemfp gets <b>16</b> ns for size 2,048. Since the chemfp time scales linearly with dimensionality, sparse matrices are effectively working a lot faster.</p>
+
+  <p>Some scikit-learn estimators work well with sparse fingerprints, but others don't so  mileage may vary. 
+
+  <p><b>Memory usage</b> - This is straightforward - sparse arrays don't explicitly store the zeroes, allowing you to increase fingerprint size at nearly no cost. The only added cost is a slight increase due to reducing bit-collisons which, as I explore in <a href="https://chemrxiv.org/articles/preprint/State_of_the_Art_Iterative_Docking_with_Logistic_Regression_and_Morgan_Fingerprints/14348117">doi</a>, is actually a win not a cost. 10 million sparse Morgan fingerprints are about 1.5 GB in RAM at size 65,528.</p>
+
+  <p>There's some improvements to make on both fronts. Dot products have to multiply each intersecting value, but we know the product of two bits is still going to be one bit, meaning the dot-product could be re-written to just perform bit-equality operations. Likewise, we know all bits are going to be equivalent to '1', so the sparse matrix doesn't need to store the bits explicitly.</p>
+
+  <p><b>The code</b></p>
+
+  <code>
+    <pre>
+def make_fingerprints(smiles):
+    """Parse list of smiles into fingerprints, stored as sparse matrix.
+    Currently using size 65536 - this is usually way too large, 
+    but it leaves room to move. Plus, there's no loss in 
+    memory from using large sizes due to the sparsity. 
+    
+    There is a folding function to get back to common usage sizes. 
+    """
+
+    #see FPSim2 for these parameters
+    fingerprint_function = rdMolDescriptors.GetMorganFingerprintAsBitVect
+    pars = { "radius": 2,
+                     "nBits": 65536,
+                     "invariants": [],
+                     "fromAtoms": [],
+                     "useChirality": False,
+                     "useBondTypes": True,
+                     "useFeatures": True,
+            }
+
+    #store bit indices in these:
+    row_idx = list()
+    col_idx = list()
+    
+    count = 0
+    
+    #iterate through smiles, 
+    for smi in tqdm.tqdm_notebook(smiles, smoothing=0):
+        try:
+            mol = Chem.MolFromSmiles(smi)
+            fp = fingerprint_function(mol, **pars)
+        
+            #if the smiles failed to parse, it would have given an exception by now.
+            onbits = list(fp.GetOnBits())
+            #these bits all have the same row:
+            row_idx += [count]*len(onbits)
+            #and the column indices of those bits:
+            col_idx+=onbits
+            #update the count
+            count+=1
+        except KeyboardInterrupt:
+            raise
+        except:
+            print('smiles failed')
+
+    
+    #generate a sparse matrix out of the row,col indices:
+    unfolded_size = 65536
+    
+    fingerprint_matrix = sparse.coo_matrix((np.ones(len(row_idx)).astype(bool), (row_idx, col_idx)), 
+                      shape=(max(row_idx)+1, unfolded_size))
+    
+    #convert to csr matrix, smaller and usually faster too:
+    fingerprint_matrix =  sparse.csr_matrix(fingerprint_matrix)
+
+    return fingerprint_matrix
+    </pre>
+    </code>. 
+    
+  
+    
+  
+
+
+
+   

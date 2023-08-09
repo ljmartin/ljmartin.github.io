@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Download active ligands from ChEMBL in python </h1>
+  <a href="https://github.com/ljmartin/download_chembl">Github repo</a><br>
+  <p>People often ask "How many / what kinds of ligands are known to hit Protein X?" Answering this involves querying a database of ligand activities like <a href="https://www.ebi.ac.uk/chembl/">ChEMBL</a>, <a href="https://www.bindingdb.org/bind/index.jsp">BindingDB</a>, or <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a>. These offer <code>.csv</code> downloads after a manual search, or large database downloads for doing <code>SQL</code> queries.
+
+  <p>Alternatively it's nice to have an automated approach that can slot into a workflow. I've re-written this code enough times that it's worth writing up as a reference even for myself. The code below queries the ChEMBL server using their web services API and downloads the associated active ligands, where 'activity' is defined by a pchembl value. It doesn't require installing any uncommon packages and runs in about a minute (depending on the number of ligands), resulting in a pandas dataframe with SMILES codes, pchembl values, and some other ligand properties. 
+
+  <p>Just Ctrl-C + Ctrl-V, set the chembl accession code and the pchembl value, and run: 
+    
+    <code>
+      <pre>
+import requests
+import json
+import pandas as pd
+
+pchembl = 5 #equivalent to 10uM
+chembl_accession = 'CHEMBL4333' #S1p receptor
+n = 10_000 #try loading n first. If there's more than 10,000 ligands, they will be queried again.
+
+print('Counting bioactivities:')
+urlString = "https://www.ebi.ac.uk/chembl/api/data/activity.json?target_chembl"
+urlString += "_id__exact=%s&pchembl_value__gt=%s&limit=%s" % (chembl_accession, pchembl, n)
+webQuery = json.loads(requests.get(urlString).content)
+total_count = webQuery['page_meta']['total_count']
+print(f'{total_count} ligands listed')
+
+
+if total_count>n:
+    print('Lots of ligands, loading more...')
+    urlString = "https://www.ebi.ac.uk/chembl/api/data/activity.json?target_chembl_id"
+    urlString += "__exact=%s&pchembl_value__gt=%s&limit=%s" % (chembl_accession, pchembl, total_count)
+    webQuery = json.loads(requests.get(urlString).content)
+    print('Done')
+    
+activities = webQuery['activities']
+
+df = pd.DataFrame(activities)
+
+while len(df)&lt;total_count:
+    urlString = "https://www.ebi.ac.uk"+webQuery['page_meta']['next']
+    print(urlString)
+    webQuery = json.loads(requests.get(urlString).content)
+    activities = webQuery['activities']
+    df = pd.concat([df, pd.DataFrame(activities)])
+    print(f'Loaded {len(df)} of {total_count}')
+</code>
+</pre>

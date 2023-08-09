@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+
+	<!-- twitter card:-->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:site" content="@lewischewis" />
+	<meta name="twitter:title" content="Fetch PDB codes and bound ligands programmatically" />
+	<meta name="twitter:description" content="querying RCSB with python" />
+	<meta name="twitter:image" content="https://ljmartin.github.io/data/rcsb_lig.png" />
+	<meta name="twitter:image:alt" content="A pandas dataframe showing PDB codes and bound ligands"/>
+	
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Fetch PDBs and bound ligands  programmatically </h1>
+  <a href="https://gist.github.com/ljmartin/b6c3d17f5321293211987885b6ac7192">See the gist on Github.</a><br>
+  <p>A common starting point in any contemporary research related to protein-ligand interactions is to take stock of all the X-ray or cryo-EM structural data deposited in the public database, <a href="https://www.rcsb.org">RCSB</a>. While there are advanced search options, normal RCSB search often brings up 'incorrect' results due to non-standard naming protocols (i.e. proteins with multiple common names), and it's not clear how deeply you need to search to identify all results.</p>
+
+  <p>An alternative is to do this programmatically (python) using the RCSB REST API by searching for gene name. This can fit into existing code workflows, is repeatable, and takes ten seconds. In addition, being in python you can integrate with RDKit and parse the co-crystallized ligands directly.</p>
+
+  <p>The code below is a copy-and-pastable snippet to do this. First, set the gene name to the protein of interest. The script queries the RCSB REST API for all associated protein structures, including co-crystallized ligands (called non-polymer entities), then queries the RCSB GraphQL interface for the SMILES. The output is a pandas dataframe with PDB codes, SMILES codes, and ligand pictures for your perusal.</p>
+
+  <p>This workflow could easily be extended by, for example, filtering ligands for drug-like properties to remove things like lipids or sulfates, or intergrating with py3Dmol to visualize binding sites. Although the latter is done really well on the RCSB website, it's  a pain to hold 15 structures in tabs while trying to visualize them together.</p>  
+        
+    <script src="https://gist.github.com/ljmartin/b6c3d17f5321293211987885b6ac7192.js"></script>
+    
+
+
+   

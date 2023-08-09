@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>LJM CompMedChem</title><link>https://ljmartin.github.io/</link><description>Sideprojects and code snippets for compchemistry</description><generator>rfeed v1.0.0</generator><docs>https://github.com/svpino/rfeed/blob/master/README.md</docs><item><description>&lt;main&gt;
+&lt;h1&gt; Rendering with Fresnel &lt;/h1&gt;
+&lt;a href="https://gist.github.com/ljmartin/523fefaf2528ab84be3e1868136b5852#file-molecules_with_fresnel-ipynb"&gt;Link to the Gist&lt;/a&gt;
+&lt;p&gt;
+    It's convenient to have a nice rendering tool for molecular systems. ChimeraX is the best GUI option hands down, but sometimes a scripted option is better because it's shareable, repeatable and often more customisable. The &lt;a href="https://github.com/glotzerlab/fresnel"&gt;Fresnel library&lt;/a&gt; is a great option for python.
+
+  &lt;p&gt;
+    This is a short post just to show how Fresnel works (see Gist below). I wrote this example code a couple of years ago, and tested it yesterday -  it's still current. One nice thing about rendering proteins from scratch is that it really forces you to realise that the core of computational med-chemistry is just a bunch of &lt;code&gt;3 x n_atoms&lt;/code&gt; arrays, to represent the xyz coordinates, and &lt;code&gt;n_atoms x n_atoms&lt;/code&gt; arrays for the bonding/adjacency matrix. Realising this takes one from using tools towards writing tools. 
+
+
+    &lt;script src="https://gist.github.com/ljmartin/523fefaf2528ab84be3e1868136b5852.js"&gt;&lt;/script&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Wed, 05 Apr 2023 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; PDB Similarity with RDKitJS &lt;/h1&gt;
+&lt;a href="https://ljmartin.github.io/rdkitjs_pdbsim.html"&gt;Link to the Javascript tool&lt;/a&gt;
+&lt;p&gt;
+    Working with hits that have no crystal structure, one often wonders whether the proposed binding mode is accurate. Having a good understanding of this helps facilitate the analoguing phase. While the analogue SAR can inform on the binding mode, one way to build supporting evidence beforehand is comparison to existing PDB ligand structures.
+
+  &lt;p&gt;
+    The RCSB does have an input field for SMILES (&lt;code&gt;Advanced Search &amp;gt; Chemical Similarity&lt;/code&gt;, then &lt;code&gt;Query Type = Descriptor&lt;/code&gt;), but I find it sometimes returns nothing - perhaps there is some unknown threshold. Doing the same in rdkit/python, where every parameter is controllable, is something I do often. Nevertheless, it's still a pain loading up a notebook every time.
+
+    &lt;p&gt;
+      Recently, &lt;a href="https://github.com/rdkit/rdkit-js"&gt;RDKitJS&lt;/a&gt; has had a lot of improvements, and it's perfect for a web-based tool that can be accessed quickly. As a project to learn Javascript, I wrote an app (?) that takes a query SMILES, fingerprints all the ligands from the PDB (with mol.wt. 200-550), and returns a list, ordered by similarity to the query, along with pictures. The list is formatted by &lt;a href="https://datatables.net/"&gt;datatables&lt;/a&gt;. As an aside, it's a lot of fun to browse the different javascript spreadsheet options at &lt;a href="https://jspreadsheets.com/"&gt;jspreadsheets&lt;/a&gt;.
+
+      &lt;p&gt;Technically it works on iOS, but it doesn't look correct. And please note that it still takes 15-20 seconds to featurize all the PDB molecules :) otherwise, it's just like the python equivalent. 
+
+        &lt;a href="https://ljmartin.github.io/rdkitjs_pdbsim.html"&gt;Use the tool here.&lt;/a&gt;
+&lt;hr/&gt;
+&lt;b&gt;PostScript for javascript newbies like me:&lt;/b&gt;
+
+        Just inspect the JS to see how it's all done, but don't expect anything pretty! There were three components that had to be figured out: 
+
+      &lt;p&gt;1: Reading a CSV file of names and SMILES. I used ChatGPT here. I'm not even sure what the xml http request does, but it seems pretty general - it just loads data that comes from a file rather than being  present in the js or html of the page.
+      &lt;p&gt;2: Using RDKitJS to fingerprint molecules into a 'dataframe'. This is done by creating an array of arrays, splitting each row and appending (smiles, name, fp) triplets. The RDKitJS function for fingerprinting is  demonstrated in &lt;a href="https://github.com/eloyfelix/rdkitjs_onnx_multitask"&gt;this chembl blog code&lt;/a&gt;, but note that it's deprecated and now takes parameters supplied as a JSON string. Storing this array separately from the fingerprinting code means the FPs only need to be calculated once.
+
+      &lt;p&gt;3: Calculating similarities and showing a table. This was the most involved. ChatGPT gave an incorrect function to calculate Tanimoto similarity, but it was close enough to figure it out. I could not figure out a way to use sparse fingerprints, but there is a way (&lt;a href="https://github.com/rdkit/rdkit/issues/4329"&gt;see datagrok&lt;/a&gt;). I also wanted the datatables object to be refreshable, but once it's rendered on the page it won't re-render straightforwardly. To do that, you'll see that the app first instantiates a table with an empty data array. At the point of requesting similarities, this table is deleted and a new table is populated that contains the similarities to whatever query SMILES is in the text field at that time.
+
+        &lt;p&gt;
+        The grid of molecules at the end is a hack - I don't think there's a &lt;code&gt;MolsToGridImage&lt;/code&gt; in RDKitJS yet. But I could re-use the drawing function used at the top of the page, adding an &lt;code&gt;inline&lt;/code&gt; option that specifies a &lt;code&gt;class='column'&lt;/code&gt; tag in the relevant div, along with some css in the header, which emulates a grid. 
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Mon, 20 Feb 2023 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; Storing mols in parquet files &lt;/h1&gt;
+&lt;p&gt;
+    SDF is a common and handy format for modelling molecular properties or protein-ligand interactions. Nevertheless, after scaling up to millions of compounds, they become unwieldy: Firstly, the file sizes get large. This is resolved easily using gzip. But secondly, loading millions of molecules - locally - into RDKit via SDF takes a long time and a lot of RAM. I frequently spilled over into swap space before using the approach below, and loading up an old project just to check a single thing used to require a brew-a-cup-of-coffee-sized wait, while now it takes seconds.
+
+  &lt;p&gt; Parquet (par-kay) files are a great alternative to store SDF data - you can load them (fast) with pandas, query any other column data with duckdb, and they're small. They take up less RAM, but the compound data (SDF) can quickly be turned back into Chem.Mol objects. Because they're handled by pandas, you can use it as random-access object unlike a gzipped SDF. This makes the most difference when you only care about a small fraction of the compounds at a time, which is the case in many large-scale compchem settings.
+
+    &lt;p&gt;Fitting an SDF into a pandas column is a bit hacky but it just works in practice:
+    
+    &lt;pre&gt;
+      &lt;code&gt;
+import pandas as pd
+import zlib
+from rdkit import Chem
+
+## how to save
+mols = ... #some list of RDKit mols
+sdfs = [zlib.compress(Chem.MolToMolBlock(mol).encode('utf-8')) for mol in mols]
+scores = [m.GetProp('myScore') for m in mols]
+df = pd.DataFrame({
+    'names':[m.GetProp("_Name") for m in ms],
+    'score':scores,
+    'sdfs':sdfs
+})
+df.to_parquet('./df.parquet')
+
+## how to load:
+df = pd.read_parquet('./df.parquet')
+
+# we only need to turn a subset of compounds into Chem.Mol objects:
+sel = df.nlargest(500, 'score')
+mols = [Chem.MolFromMolBlock(zlib.decompress(sdf)) for sdf in sel['sdfs']]
+# do stuff with them...
+
+      &lt;/code&gt;        
+    &lt;/pre&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Fri, 13 Jan 2023 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; Visualizing crystal contacts with PDBe-Molstar&lt;/h1&gt;
+&lt;p&gt;A great gotcha in structure-based hit discovery is when a binding site or bound ligand is affected by crystal contacts. Crystal contacts here refers to  adjacent protein molecules contacting each other in the crystal used for X-ray crystallography in a way that would not happen in solution. While having some contacts is normal, they become problematic when they distort the ligand or surrounding protein.
+
+  &lt;p&gt;For example, take &lt;a href="https://www.rcsb.org/3d-view/6GJ7?preset=ligandInteraction&amp;amp;label_asym_id=D"&gt;a look at the binding mode of BI-2852&lt;/a&gt;, a KRAS inhibitor that came out of a fragment screen. Interestingly, this arose from a 2 &lt;em&gt;milliMolar&lt;/em&gt;, fragment. It was optimized to a sub-microMolar binder, despite not making many more protein contacts. Half of it is barely hanging on to the protein yet, for some reason, it is stable in this position as judged by it's &lt;a href="https://files.rcsb.org/pub/pdb/validation_reports/gj/6gj7/6gj7_full_validation.pdf#page=13"&gt;well-resolved density&lt;/a&gt; (per the validation report on RCSB).
+
+  &lt;p&gt;This odd ligand behaviour is a candidate for crystal contact interference. We can use &lt;a href="https://github.com/molstar/pdbe-molstar"&gt;PDBe-Molstar&lt;/a&gt;, a convenient protein+ligand visualization tool, to see these. The key line is setting the option &lt;code&gt;defaultPreset&lt;/code&gt; to &lt;code&gt;'unitcell'&lt;/code&gt; - see an example below and inspect the source of this page to see how that works. You'll notice that the BI-2852 molecules sit snugly between two copies of KRAS, explaining the stability of the &lt;em&gt;apparently&lt;/em&gt; solvent-exposed groups. Click one of the intercalating ligands and you'll see that about 50% of the buried surface area is in an adjacent protein unit.
+
+    &lt;h4&gt;Visualization:&lt;/h4&gt;
+&lt;div id="myViewer"&gt;&lt;/div&gt;
+&lt;script&gt;
+
+      //Create plugin instance
+      var viewerInstance = new PDBeMolstarPlugin();
+
+      //Set options (Checkout available options list in the documentation)
+      var options = {
+        moleculeId: '6gj7',
+          hideControls: true,
+        bgColor: {r:255, g:255, b:255},
+        defaultPreset: 'unitcell'
+
+      }
+
+      //Get element from HTML/Template to place the viewer
+      var viewerContainer = document.getElementById('myViewer');
+
+      //Call render method to display the 3D view
+      viewerInstance.render(viewerContainer, options);
+
+  &lt;/script&gt;
+&lt;p&gt;It's arguable whether the crystal contacts are relevant in this case. Indeed some researchers &lt;a href="https://www.pnas.org/doi/10.1073/pnas.1918164117"&gt;argue they are&lt;/a&gt; - and the BI folks &lt;a href="https://www.pnas.org/doi/abs/10.1073/pnas.1921236117"&gt;argue they aren't&lt;/a&gt;! Having a tool to visualize these at least helps one to make a judgement themselves.
+
+    &lt;p&gt;&lt;b&gt;Alternatives:&lt;/b&gt; I often just open a &lt;a href="https://embed.plnkr.co/plunk/094fAnyWsuQVtYja"&gt;pdbe-molstar plunker&lt;/a&gt;, change the pdb code, and add &lt;code&gt;defaultCell: 'unitPreset'&lt;/code&gt;. That isn't secure, and requires internet. &lt;a href="https://pymolwiki.org/index.php/Symexp"&gt;PyMol has&lt;/a&gt; a &lt;code&gt;symexp&lt;/code&gt; command if you can bare to use it, and &lt;a href="https://www.cgl.ucsf.edu/chimerax/docs/user/tools/crystalcontacts.html"&gt;ChimeraX has&lt;/a&gt; a crystal contacts tool as well, but the resulting visualization can churn through CPU.  
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Tue, 11 Oct 2022 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; Bayesian IC50 fits &lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://gist.github.com/ljmartin/b1567d48424975a7d3513df16e8d7503"&gt;Notebook gist&lt;/a&gt;&lt;br/&gt;
+&lt;p&gt;Concentration-response curve are fit to data points to determine an IC50 value for an inhibitor (or EC50 for agonists). Often there's scant information on how the fit was generated - in publications or from CROs. The settings of the fits can make a huge difference. For instance, I have observed fits where the highest inhibition value appears to fly off to infinity, in an assay system where it should not. In most cases, we know beforehand whereabouts the maximal inhibition &lt;i&gt;should&lt;/i&gt; be.
+
+  &lt;p&gt;Clever construction of a frequentist curve-fit could avoid this but it's also the perfect setting for a Bayesian fit, allowing one to encode reasonable priors beforehand. This setting also allows one to visualize uncertainty in flexible and intuitive ways, and easily query things like the probability that the IC50 is greater than X. Finally, fitting the curve yourself is just a great exercise since it forces you to define all the assumptions, and it's just easier to fit complex curves with Bayesian methods.
+
+  &lt;p&gt;The gist below demonstrates how to use PyMC3 to fit some inhibition data to estimate a CRC. It shows how to query the fit to show the uncertainty in the estimated IC50 - often this is a lot bigger than you might expect from the single estimate in an automatically generated report! Finally it demonstrates a spaghetti plot, which is a lovely way to visualize how the uncertainty in the parameters effects the ultimate curve. 
+
+&lt;script src="https://gist.github.com/ljmartin/b1567d48424975a7d3513df16e8d7503.js"&gt;&lt;/script&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Tue, 29 Mar 2022 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; RDKit Mols in altair plots &lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://github.com/ljmartin/altair_mols"&gt;Repo&lt;/a&gt;&lt;br/&gt;
+&lt;a href="https://github.com/ljmartin/altair_mols/blob/main/altair_plot_mols.ipynb"&gt;Notebook&lt;/a&gt;&lt;br/&gt;
+&lt;p&gt;I recently came across a great looking library called &lt;a href="https://github.com/wjm41/molplotly"&gt;molplotly&lt;/a&gt;. It uses plotly to show small pictures (aka tooltips) of the molecule associated with a scatterplot point on mouse-over. Along with &lt;a href="https://github.com/cbouy/mols2grid"&gt;mols2grid&lt;/a&gt;, it's a great way to parse data or share it collaboratively to an audience.
+
+    &lt;p&gt;Below I demonstrate an alternative using &lt;a href="https://altair-viz.github.io/"&gt;altair&lt;/a&gt;. Altair visualizations look great, although there's a steep learning curve unless you're already familiar with the 'grammar of graphics' a la ggplot. There's a bit of tinkering to set up each plot, but at the same time there's a lot of freedom to customize each visualization as shown below.  
+
+    &lt;p&gt;The notebook uses a sample of drug-like ligands from the RCSB Ligand Expo with clogp, molwt, and tpsa values along with some fake potency data. The main trick to get image tooltips is to add a column to the input dataframe that specifies a URL path to each ligand's image file (which have to be generated beforehand). Beware that in notebooks, the image path will be relative to the notebook server rather than the filesystem.
+
+      &lt;h3&gt;Scatter plot of MolWt. vs cLogP&lt;/h3&gt;
+      Below demonstrates plotting three dimensions (molwt, clogp, and potency as colour) along with tooltips, which appear on a mouse-over. &lt;br/&gt;
+&lt;div id="vis1"&gt;&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+  var spec = "https://raw.githubusercontent.com/ljmartin/altair_mols/master/scatterplot.json";
+  vegaEmbed('#vis1', spec).then(function(result) {
+    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+  }).catch(console.error);
+&lt;/script&gt;
+&lt;h3&gt;Horizontal scatterplot with molecules in yaxis labels&lt;/h3&gt;
+Below demonstrates the ability to encode two types of images: one in the y-axis labels, and a different one in the tooltips. This might be useful for comparing two sets of molecules or, alternatively, putting 2D structures in the axis and 3D structures of binding modes in the tooltip.&lt;br/&gt;
+&lt;div id="vis2"&gt;&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+  var spec = "https://raw.githubusercontent.com/ljmartin/altair_mols/master/ylabels.json";
+  vegaEmbed('#vis2', spec).then(function(result) {
+    // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+  }).catch(console.error);
+&lt;/script&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Wed, 16 Feb 2022 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; Tree trunk molecules &lt;/h1&gt;
+  There are (at least) two reasons one might want to coarse-grain a molecular structure:&lt;br/&gt;&lt;br/&gt;
+
+  1) — Interested parties often wish to know the structure before judging whether it's worth pursuing. Showing an image of the structure is enough to give away the secret.  If it is patented then it's already public knowledge - if it's &lt;i&gt;not&lt;/i&gt; patented, showing a picture without coarse-grainig is almost equivalent to giving it away.&lt;br/&gt;
+  2) — Scaffold analysis requires some automated definition of 'scaffold', which typically means removing 'cabbage' such as terminal atoms, and could include removing atom type and bond order.
+
+  The first reason is described on &lt;a href="https://www.eyesopen.com/ants-rants/passing-of-andrew-grant"&gt;Ant's Rants, discussing Andrew Grant's use of Gaussians&lt;/a&gt; fit to molecules:
+
+  &lt;blockquote&gt;The best use we ever envisioned, and actually published upon, was as an anonymization technique: i.e., you could obscure what the underlying molecular structure was but keep the shape. I hope this, or some other use, one day catches on as I know it was Andy’s favorite piece of work.&lt;/blockquote&gt;
+
+  The second reason is demonstrated by &lt;a href="https://doi.org/10.1021/acs.joc.9b02111"&gt;Lipkus et al. from CAS&lt;/a&gt;:
+
+  &lt;blockquote&gt;The diversity is characterized using the framework content of the compounds; the framework of a molecule is the scaffold consisting of all its ring systems and all the chain fragments connecting them.&lt;/blockquote&gt;
+
+  This code performs the second (FYI the first can be achieved with &lt;a href="https://pdbj.org/gmfit/"&gt;GMMFit&lt;/a&gt;), but could be used for both. The full molecule can be thought of as a Christmas tree with all the decorations. Successively removing the decorations - yielding Murcko - then the leaves - yielding Generic Murcko - and all the branches results in just the tree trunk, aka framework aka anonymized scaffold:
+
+  &lt;script src="https://gist.github.com/ljmartin/906f0ebb9a5f76aa856286242cbd128e.js"&gt;&lt;/script&gt;
+&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Mon, 10 Jan 2022 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; Remaking forces in OpenMM &lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://github.com/ljmartin/omm_remake_forces"&gt;Repo&lt;/a&gt;&lt;br/&gt;
+&lt;p&gt;&lt;a href="https://openmm.org/"&gt;OpenMM&lt;/a&gt; is a great tool for molecular dynamics, in part because it is fully customizable via the Python API. On the other hand, with great flexibility comes great complexity. A single incorrect choice of settings can lead to simulations that explode for seemingly no reason, or (worse) run fine but produce incorrect results. One common way to sanity check anything involving customized behaviour is to calculate the potential energy of the customized system and compare to the native version.
+
+  &lt;p&gt;To that end, I re-wrote the energy functions (as Custom*Force objects) for bonds, angles, torsions, and non-bonded (electrostatic and lennard-jones) forces, which covers everything for common additive force fields. While this just involves re-writing the energy function and re-using the parameters of a native system, it becomes more useful when adding terms that distort the potential energy for use in enhanced sampling or free energy calculation. 
+
+  &lt;p&gt;For instance, these custom force functions are the starting point for implementing free energy estimation techniques such as &lt;a href="https://github.com/ljmartin/generalized_tempering"&gt;generalized tempering&lt;/a&gt; or &lt;a href="https://gist.github.com/ljmartin/4e01f2b32033dcde32264dbbcec2b7df"&gt;alchemical annihilation&lt;/a&gt;, which I'll come back to!
+
+  &lt;p&gt;The replacement functions are copied here for convenience:
+&lt;p&gt;Replacing bonds:
+    &lt;code&gt;
+&lt;pre&gt;
+def replaceBonds(system):
+    forces = system.getForces()
+    for c, f in enumerate(forces):
+        if isinstance(f, HarmonicBondForce):  
+            energy_expression = "0.5*k*(r-r0)^2;"      
+            new_bond_force = CustomBondForce(energy_expression)
+            new_bond_force.addPerBondParameter("k")
+            new_bond_force.addPerBondParameter("r0")   
+            for bond in range(f.getNumBonds()):
+                
+                pars = f.getBondParameters(bond)
+                new_bond_force.addBond(pars[0], pars[1], [pars[3], pars[2]])
+            system.addForce(new_bond_force)
+        
+    for c, f in enumerate(forces):
+        if isinstance(f, HarmonicBondForce):
+            system.removeForce(c)
+      &lt;/pre&gt;
+&lt;/code&gt;
+&lt;p&gt;Replacing angles:
+    &lt;code&gt;
+&lt;pre&gt;
+def replaceAngles(system):
+    forces = system.getForces()
+    for c, f in enumerate(forces):
+        if isinstance(f, HarmonicAngleForce):
+            energy_expression = "0.5*k*(theta-theta0)^2;"
+            new_angle_force = CustomAngleForce(energy_expression)
+            new_angle_force.addPerAngleParameter("k")
+            new_angle_force.addPerAngleParameter("theta0")
+            for angle in range(f.getNumAngles()):
+
+                a1,a2,a3, theta0, k = f.getAngleParameters(angle)
+                new_angle_force.addAngle(a1, a2, a3, [k,theta0])
+            system.addForce(new_angle_force)
+
+    for c, f in enumerate(forces):
+        if isinstance(f, HarmonicAngleForce):
+            system.removeForce(c)
+      &lt;/pre&gt;
+&lt;/code&gt;
+&lt;p&gt;Replacing torsions:
+    &lt;code&gt;
+&lt;pre&gt;
+def replaceTorsions(system):
+    forces = system.getForces()
+    for c, f in enumerate(forces):
+        if isinstance(f, PeriodicTorsionForce):
+            energy_expression = "k*(1+cos(periodicity*theta-theta0))"
+            new_torsion_force = CustomTorsionForce(energy_expression)
+            new_torsion_force.addPerTorsionParameter("k");
+            new_torsion_force.addPerTorsionParameter("periodicity")
+            new_torsion_force.addPerTorsionParameter("theta0");
+
+            for torsion_index in range(f.getNumTorsions()):
+                a0, a1, a2, a3, periodicity, phase, k = f.getTorsionParameters(torsion_index)
+                new_torsion_force.addTorsion(a0, a1, a2, a3, [k, periodicity,phase])
+            system.addForce(new_torsion_force)
+
+    for c, f in enumerate(forces):
+        if isinstance(f, PeriodicTorsionForce):
+            system.removeForce(c)
+      &lt;/pre&gt;
+&lt;/code&gt;
+&lt;p&gt;Replacing nonbonded-interactions (note: this uses reaction field and, at present, requires turning the long-range dispersion correction off):
+  &lt;code&gt;
+&lt;pre&gt;
+def replaceNonbonded(system):
+    forces = system.getForces()
+    for c, f in enumerate(forces):
+        if isinstance(f, NonbondedForce):
+            original_nbforce = f
+            ONE_4PI_EPS0 = 138.935456
+            epsilon_solvent = original_nbforce.getReactionFieldDielectric()
+            r_cutoff = original_nbforce.getCutoffDistance()
+            k_rf = r_cutoff**(-3) * ((epsilon_solvent - 1) / (2*epsilon_solvent + 1))
+            c_rf = r_cutoff**(-1) * ((3*epsilon_solvent) / (2*epsilon_solvent + 1))
+
+            energy_expression = "electrostatics+sterics;"
+
+            energy_expression += "electrostatics=ONE_4PI_EPS0*chargeprod*(r^(-1) + k_rf*r^2-c_rf);"
+            energy_expression += "chargeprod = charge1*charge2;"
+            energy_expression += "k_rf = %f;" % (k_rf.value_in_unit_system(md_unit_system))
+            energy_expression += "c_rf = %f;" % (c_rf.value_in_unit_system(md_unit_system))
+            energy_expression += "ONE_4PI_EPS0 = %f;" % ONE_4PI_EPS0
+
+            energy_expression += "sterics=4*epsilon*((sigma/r)^12 - (sigma/r)^6);"
+            energy_expression += "epsilon = sqrt(epsilon1*epsilon2);"
+            energy_expression += "sigma = 0.5*(sigma1+sigma2);"
+
+            new_custom_nonbonded_force = openmm.CustomNonbondedForce(energy_expression)
+            new_custom_nonbonded_force.addPerParticleParameter('charge')
+            new_custom_nonbonded_force.addPerParticleParameter('sigma')
+            new_custom_nonbonded_force.addPerParticleParameter('epsilon')
+
+            new_custom_nonbonded_force.setNonbondedMethod(original_nbforce.getNonbondedMethod())
+
+            new_custom_nonbonded_force.setCutoffDistance(original_nbforce.getCutoffDistance())
+            new_custom_nonbonded_force.setUseLongRangeCorrection(False)
+
+            energy_expression = "4*epsilon*((sigma/r)^12 - (sigma/r)^6) + ONE_4PI_EPS0*chargeprod/r;"
+            energy_expression += "ONE_4PI_EPS0 = {:f};".format(ONE_4PI_EPS0)  # already in OpenMM units
+            new_custom_bond_force = openmm.CustomBondForce(energy_expression)
+            new_custom_bond_force.addPerBondParameter('chargeprod')
+            new_custom_bond_force.addPerBondParameter('sigma')
+            new_custom_bond_force.addPerBondParameter('epsilon')
+
+            for index in range(system.getNumParticles()):
+                [charge, sigma, epsilon] = original_nbforce.getParticleParameters(index)
+                new_custom_nonbonded_force.addParticle([charge, sigma, epsilon])
+
+            for index in range(original_nbforce.getNumExceptions()):
+                idx, jdx, c, s, eps = original_nbforce.getExceptionParameters(index)
+                new_custom_nonbonded_force.addExclusion(idx, jdx)
+                c_value = c/elementary_charge**2
+                eps_value = eps/(kilojoule/mole)
+                if c_value != 0 or eps_value!=0:
+                    new_custom_bond_force.addBond(idx, jdx, [c, s, eps])
+
+            system.addForce(new_custom_nonbonded_force)
+            system.addForce(new_custom_bond_force)
+
+
+    for c, f in enumerate(forces):
+        if isinstance(f, NonbondedForce):
+            system.removeForce(c)
+    &lt;/pre&gt;
+&lt;/code&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Mon, 06 Dec 2021 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; Meshing spherical harmonics &lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://github.com/ljmartin/meshing_stuff"&gt;Repo&lt;/a&gt;&lt;br/&gt;
+&lt;a href="https://github.com/ljmartin/meshing_stuff/blob/main/spherical_harmonics/mesh_spherical_harmonics.ipynb"&gt;Notebook&lt;/a&gt;
+&lt;p&gt;Spherical harmonics seem to be in vogue in biophysical modeling recently, so I set out for an intuitive understanding of what they are. They aren't easily plotted in 2d, since they are defined on the unit sphere. Matplotlib and mayavi can plot isosurfaces, but as an exercise I take a more hands-on approach rather than just calling a function.
+
+  &lt;p&gt;Scipy can &lt;a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.sph_harm.html"&gt;evaluate a spherical harmonic&lt;/a&gt;, of a given order and degree, for a given azimuth and altitude. This results in a spherical heat-map, i.e. positive and negative values defined on the surface of the unit sphere. To turn this into an iso-surface the notebook linked above evaluates the function using the angular coordinates of every grid point in a cube, then compares the spherical harmonic value of each point to the point's actual distance from the origin. This defines a signed distance function (SDF), which can then be meshed with &lt;a href="http://paulbourke.net/geometry/polygonise/"&gt;marching cubes&lt;/a&gt; after converting from spherical coordinates back into grid coordinates, then back into universe coordinates.
+
+   &lt;p&gt;Incidentally I figured out that &lt;a href="https://skoch9.github.io/meshplot/tutorial/"&gt;meshplot&lt;/a&gt; can write meshes to .html, which can be saved on github and published via github pages such that they can be embedded in a webstite as an html object, like so (try moving it around!):
+
+    &lt;object data="https://ljmartin.github.io/meshing_stuff/spherical_harmonics/spherical_harmonics.html" height="600" width="100%"&gt;&lt;/object&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Thu, 02 Dec 2021 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; Preparing protein PDBs for docking &lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://github.com/ljmartin/pdb_to_pdbqt"&gt;Repo&lt;/a&gt;&lt;br/&gt;
+&lt;a href="https://github.com/ljmartin/pdb_to_pdbqt/blob/main/pdb_to_pdbqt.ipynb"&gt;Notebook&lt;/a&gt;
+&lt;p&gt;Recently &lt;a href="https://chemrxiv.org/engage/chemrxiv/article-details/6107fc3340c8bd01539a36f4"&gt;'DockStream'&lt;/a&gt; was released, some software from a team at AstraZeneca that is used for driving reinforcement learning models to generate molecules that dock well. Part of the pipeline is preparing PDB files for docking. 
+
+  &lt;p&gt;This post is to share my workflow for preparing PDB files. Like DockStream, it uses &lt;a href="https://github.com/openmm/pdbfixer"&gt;PDBFixer&lt;/a&gt;. In addition to that, it aligns the target coordinates along the principal moment of inertia of the ligand - doing this means the docking box axes are aligned to the xyz axes, so you can cover the ligand cavity totally with a smaller volume, reducing docking time slightly. The actual conversion to PDBQT is a relatively small step, since OpenBabel does this reliably in a one-liner from the CLI. 
+
+  &lt;p&gt;In addition, it also demonstrates further processing with OpenMM. PDB files often have issues such as missing atoms and bonds, and PDBFixer interprets those correctly based on known bonding templates for protein residues. However, sometimes the coordinates are nonphysical, which requires minimization via a forcefield. I've noticed that minimization in the absence of a bound ligand can 'crush' the binding cavity, so it helps to have the ligand present. This then requires new parameterization of the ligand for treatment by the forcefield! Luckily the OpenMM folks thought of that and provide &lt;a href="https://github.com/openmm/openmmforcefields"&gt;openmmforcefields&lt;/a&gt;. The script chooses GAFF as the parameterization algorithm. 
+
+    &lt;p&gt;The system prepared in this way could also go directly into MD, and this is a perfectly valid way to take a docked ligand into MD as well, right after &lt;a href="https://ljmartin.github.io/sideprojects/pdbqt_to_mol.html"&gt;Matching Bond Topology to PDBQT Files&lt;/a&gt;.  
+  
+
+  
+
+  
+ 
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Tue, 12 Oct 2021 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; Ligand overlay 3: meshing the solvent-excluded surface &lt;/h1&gt;
+&lt;p&gt;
+&lt;a href="https://github.com/ljmartin/align/blob/main/0.3%20meshing%20the%20SES.ipynb"&gt;Notebook on github - Step 3 meshing the SES&lt;/a&gt;
+&lt;a href="https://github.com/ljmartin/align/blob/main/SESMesh.py"&gt;SESMesh.py&lt;/a&gt;
+&lt;center&gt;&lt;img ,="" src="./pics/mesh.png" width="300"/&gt;&lt;/center&gt;
+&lt;p&gt;Volume overlap techniques calculate volume using either voxels (David Koes lab, &lt;a href="https://doi.org/10.1002/jcc.23690"&gt;doi&lt;/a&gt;) or Gaussian approximation of atoms (Grant et al &lt;a href="https://doi.org/10.1002/(SICI)1096-987X(19961115)17:14&amp;lt;1653::AID-JCC7&amp;gt;3.0.CO;2-K"&gt;doi&lt;/a&gt;, alternatively Silicos ShapeIt or &lt;a href="https://doi.org/10.1002/jcc.23603"&gt;gWEGA&lt;/a&gt;). Gaussians are nice because volume overlap becomes differentiable, and voxels are nice because the calculations are extremely fast, although they are dependent on initial orientation because they can't be rotated.
+
+  &lt;p&gt;To my knowledge no one has used triangular meshes of the solvent-excluded surface (see pic above). Meshes are nice because volume is well defined and they are deformable. Most importantly, though, they model shape using the outer surface of a molecule, which is the crucial feature of shape overlap techniques. As described in the &lt;a href="https://doi.org/10.1021/ci300601q"&gt;WEGA paper&lt;/a&gt;, using Gaussians can lead to weird artifacts where some moieties have 2- to 6-fold more volume overlap than they should thanks to overlapping Gaussian centres, which are more dense. This won't happen with a mesh.  
+
+  &lt;p&gt;If the mesh models the so-called 'solvent-excluded surface' (SES) then it is totally blind to the identity of the underlying atoms, which hopefully leads to better scaffold-hopping potential while also keeping volume overlap accurate. The SES is like a shrink-wrapped surface that measures the volume where a solvent molecule can't sample. 
+
+  &lt;p&gt;There's no formal solution for the SES - over the decades there have been tens of different approaches - all of which work pretty well but differ in memory and time requirements. My favourite approach is the one &lt;a href="https://www.cgl.ucsf.edu/chimera/data/surface-oct2013/surface.html"&gt;ChimeraX&lt;/a&gt; by Tom Godard, because it's fast and practical.
+
+  &lt;p&gt;There aren't any SES meshing applications in python, though. It took months of fiddling, but I worked out a way to do it with just numpy and scipy that takes ~500ms per molecule. It starts by sampling points on the VDW surface and solvent-accessible surface, then removes points that would overlap another atom. The re-entrant surfaces of the SES are generated by translating any VDW points that are inaccessible by a probe sphere. This is followed by marching cubes. In 3D, it generates the mesh above, in 2D, it looks like this:  
+
+    &lt;center&gt;&lt;img ,="" src="./pics/meshalg.png" width="300"/&gt;&lt;/center&gt;
+&lt;p&gt;There's a lot of improvements to make. For starters, the algorithm is quadratic in atom number so it will freeze your laptop if you attempt a whole protein. In addition, the marching_cubes algorithm could be restricted to just the grid points adjacent to the SES, rather than every grid point in the bounding box. But for now - it works :)  
+
+  
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Mon, 15 Mar 2021 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; Ligand overlay 2: aligning principal moments of inertia &lt;/h1&gt;
+&lt;p&gt;&lt;a href="./02_using_quaternions.html"&gt;See Part 1 - quaternions&lt;/a&gt;&lt;br/&gt;
+&lt;a href="https://github.com/ljmartin/align/blob/main/0.2%20aligning%20principal%20moments%20of%20inertia.ipynb"&gt;Notebook on github - Step 2 aligning along PMI&lt;/a&gt;
+&lt;center&gt;&lt;img ,="" src="./pics/monolith.png" width="300"/&gt;&lt;/center&gt;
+&lt;p&gt;In most docking and ligand-overlay techniques, the loss function is non-convex with many local minima. That means it (might be) inefficient to start from random orientations/translations when searching for the best position. To reduce the search time, for example, UCSF DOCK evaluates ligands at pre-calulated points in the binding site that are likely to hold a ligand atom, assuming that the regions in empty space are unlikely to be even close to optimal. AutoDock-based approaches, including Vina/Smina, appear to use a box-shaped boundary and search across the whole volume. This is a deliberate trade-off - DOCK aims to be fast at the cost of false negatives, while AutoDock aims to identify the best pose for any ligand, at the cost of speed.
+
+  &lt;p&gt;For ligand-overlay, it looks like Blaze checks lots of pre-calculated points, like DOCK would. ROCS begings by aligning the two molecules along the coordinate axes. Both make sense in that, &lt;i&gt;a priori&lt;/i&gt; we know there can't be good volume overlap if the ligands are far away or pointing along different axes (contrast to docking, where the discovery of new binding pockets is a potential outcome, although this is not consistently validated). Later we will deal with the case of aligning part-molecules like fragments. 
+
+  &lt;p&gt;The best way to do the initial alignment &lt;i&gt;à la&lt;/i&gt; ROCS is by aligning the "principal moments of inertia" to the x,y,z axes. A moment of inertia is a physics measurement that, intuitively, describes the amount of push you would need to rotate an object about it's centre of mass in different directions. Rotating an object along the short axis is easier, since less mass gets displaced.
+
+  &lt;p&gt;Molecules have mass but we don't care about physical properties - the moment of inertia is just a surrogate coarse descriptor for shape by identifying the 'long' axis.. Performing a principal component analysis on the moment of inertia tells us which axis is "longest" and which is "shortest". Then, one can just apply some geometry formulae to align the long axis along one of the coordinate axes.
+
+  &lt;p&gt;One complication is that a molecule can be aligned along the PMIs in any of four ways - corresponding to 180 degree rotations of the 1st and 2nd principal axis. It's not six, because the third principal axis is orthogonal to the previous two, meaning once the first two are known the 3rd is automatically defined. This can be dealt with later, but for example in ROCS they just start from all four.
+
+  &lt;p&gt;The outcome of this all is demonstrated in the picture above. Calculating the PMI of a long monolith-shaped object (blue) allows us to ensure it begins from a logical starting point (red) for comparison to other shapes. See the notebook above for more details and the code.
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Sun, 14 Feb 2021 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; Ligand overlay 1: using quaternions for rotation in python &lt;/h1&gt;
+&lt;a href="https://github.com/ljmartin/align/blob/main/0.1%20-%20quaternions%20for%20rotation.ipynb"&gt;Notebook on github - Step 1 rotating with quaternions&lt;/a&gt;
+&lt;p&gt;The &lt;a href="https://pubs.acs.org/doi/10.1021/jm0603365"&gt;twin pillars of structure-based&lt;/a&gt; drug discovery are 1) &lt;b&gt;docking&lt;/b&gt; (fitting test ligands into a known binding site), and 2) &lt;b&gt;ligand overlay&lt;/b&gt; (fitting test ligands into the shape of a known ligand). The academic literature seems to focus on machine learning approaches to virtual screening, using ML based on fingerprints or molecular graphs. But docking and ligand overlay, which were originally developed in the 90s (!), have already shown good results over the previous two decades. They may get less attention in the literature today because, as a result of their success, the developers moved into industry. See &lt;a href="https://www.cresset-group.com/software/blaze/"&gt;Blaze (overlay)&lt;/a&gt;, &lt;a href="https://www.eyesopen.com/rocs"&gt;ROCS (overlay)&lt;/a&gt;, or &lt;a href="https://www.schrodinger.com/products/glide"&gt;Glide (docking)&lt;/a&gt;. &lt;/p&gt;
+&lt;p&gt;I've been determined to implement one of these approaches in an open-software way for months, but the implementations are licensed, obscured as trade secrets or, due to historical reasons, written in fortran. While fortran is great, it doesn't fit into modern drug discovery pipelines easily and it would be nice to have a python option. Docking and ligand overlay share a lot of properties, but ligand overlay seems like the simpler place to start since the protein is absent, meaning there are fewer parameters to deal with.&lt;/p&gt;
+&lt;p&gt;A reasonable roadmap to implementing a ligand overlay pipeline might look like this:
+    &lt;ul&gt;
+&lt;li&gt;(This post) Figure out how to handle molecule rotations using quaternions, which have some advantages over rotation matrices&lt;/li&gt;
+&lt;li&gt;Align molecules by their principal moments of inertia, which is typically close to the global minimum of volume overlap&lt;/li&gt;
+&lt;li&gt;Calculate molecular volume, as well as volume overlaps. Hard-sphere, Gaussian, or solvent-excluded volumes?&lt;/li&gt;
+&lt;li&gt;Optimize the overlap function between two molecules using gradient-descent or some evolutionary algorithm like CMA-ES&lt;/li&gt;
+&lt;li&gt;Validate on some high-throughput screening data or the &lt;a href="https://pubs.acs.org/doi/10.1021/acs.jcim.0c00598"&gt;DUD-Z&lt;/a&gt; validation set. This approach should also be compared to molecular fingerprits or alignment-free shaped-based descriptors to show improvement&lt;/li&gt;
+&lt;li&gt;Optimize timing&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The first step - quaternions - is simple enough in practice, but isn't commonly taught in undergrad maths. Luckily, it's common in computer graphics so there's lots of information and some python libraries that demonstrate how it works. The advantage of using quaternions instead of a rotation matrix is that they have gradients without singularities, it's straightforward to interpolate between two rotations, and multiple rotations can be stacked by multipling quaternions (a computationally cheaper operation than matrix multiplication).
+
+  &lt;p&gt;See the notebook above for some functions that demonstrate how to use quaternions in python. These just use numpy, so should be differentiable using JAX. Later, they will be utilized to optimize the overlap between two molecules. As a sanity check, they are also used to create the following graphic of random molecule rotations. Looks like it works!
+
+    &lt;center&gt;&lt;img ,="" src="./pics/molrot.png" width="300"/&gt;&lt;/center&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Thu, 11 Feb 2021 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
+&lt;h1&gt; Header &lt;/h1&gt;
+  Short comment
+  
+  &lt;h2&gt;Subheader&lt;/h2&gt;
+&lt;a href="https://www.example.com/g"&gt;Example domain&lt;/a&gt;&lt;br/&gt;
+  Explanation text. 
+
+  
+ 
+&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Mon, 01 Jan 1900 00:00:00 GMT</pubDate></item></channel></rss>

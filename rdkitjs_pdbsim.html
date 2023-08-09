@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="author" content="ljm">
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/bitset.js/3.0.0/bitset.min.js'></script>
+  <script src='https://code.jquery.com/jquery-3.5.1.js'></script>
+  <!--<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.11.3/datatables.min.css"/>-->
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css"/>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.2/css/dataTables.bootstrap5.min.css"/>
+
+  <link rel="stylesheet" type="text/css" href="./data/dt.css">
+  <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.11.3/datatables.min.js">  </script>
+
+
+  <style>
+    h1,
+    h2,
+    h3,
+    h4 {
+      color: #044484;
+    }
+    div.container {
+      width: 70%;
+      margin: 0 auto;
+    }
+    .column {
+      float: left;
+      width: 25%;
+    }
+    
+    /* Clear floats after the columns */
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+</style>
+</head>
+
+<script src="https://unpkg.com/@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js"></script>
+
+<script>
+  onRuntimeInitialized: initRDKitModule().then(function(instance) {
+    RDKitModule = instance;
+    /*default is indomethacin*/
+    lewDraw('COc1ccc2n(c(C)c(CC(O)=O)c2c1)C(=O)c3ccc(Cl)cc3');
+  });
+
+  function calculateTanimotoSimilarity(str1, str2) {
+    if (str1.length !== str2.length) {
+      throw new Error("Strings must be of equal length");
+    }
+
+    const [sharedBits, unionBits] = countSharedBits(str1, str2);
+    return (sharedBits / unionBits).toFixed(3);
+  }
+
+  function countSharedBits(str1, str2) {
+    let sharedBits = 0;
+    let unionBits = 0;
+    for (let i = 0; i < str1.length; i++) {
+      if (str1[i] === "1" && str2[i] === "1") {
+        sharedBits++;
+      }
+      if (str1[i] === "1" || str2[i] ==="1") {
+        unionBits++;
+      }
+    }
+      return [sharedBits, unionBits];
+  }
+
+  function lewDraw(text, element="drawing", legend='query mol', inline=false) {
+    var mol = RDKitModule.get_mol(text);
+    var mdetails = {}
+    mdetails['legend'] = legend
+    var svg = mol.get_svg_with_highlights(JSON.stringify(mdetails));
+    if (svg == "") return;
+    var ob = document.getElementById(element);
+    if (inline) {
+      ob.outerHTML = "<div id='"+element+"' class='column'>" + svg + "</div>";
+    } else {
+      ob.outerHTML = "<div id='"+element+"'>" + svg + "</div>";
+      mol.delete();
+    }
+  }
+
+  const details = {"len":512, "radius":2}
+  var tdetails = JSON.stringify(details)
+
+  function fpMol(text) {
+    var mol = RDKitModule.get_mol(text);
+    const fp = mol.get_morgan_fp(tdetails);
+    mol.delete();
+    return fp;
+  }
+
+  const molFps = []
+
+  function fingerprintMols() {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "./data/pdbmols.csv");
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        const data = xhr.responseText;
+        const rows = data.split("\n");
+
+        for (let i = 1; i < rows.length; i++) {
+          const cells = rows[i].split(",");
+          const fp = fpMol(cells[0]);
+          cells.push(fp);
+          molFps.push(cells);
+        }
+        console.log('fingerprinted')
+        var ob = document.getElementById('isFingerprinted');
+        ob.innerText = ' -- mols have been fingerprinted -- '
+      } else {
+        console.error(xhr.statusText);
+      }};
+    xhr.onerror = function () {
+      console.error(xhr.statusText);
+    };
+    xhr.send();
+
+  };
+
+  const tableData = [];
+  var table = $(document).ready(function() {
+    $('#myTable').DataTable({
+      "pageLength": 20,
+      data: tableData,
+      columns: [
+        { title: "Smiles" },
+        { title: "Name" },
+        { title: "Tanimoto" }
+      ],
+      order: [[2, 'desc']]
+    });
+  });
+
+  function buildTable() {
+    tableData.length = 0;
+    const input = document.getElementById("smiles_input");
+    const text = input.value;
+    const query_fp = fpMol(text)
+
+    for (let i = 1; i < molFps.length; i++) {
+      const smiles = molFps[i][0];
+      const name = molFps[i][1];
+      const fp = molFps[i][2];
+      const tan = calculateTanimotoSimilarity(fp, query_fp);
+      const cells = [smiles, name, tan]
+      tableData.push(cells)
+    }
+    console.log('similaritied')
+    if ( $.fn.dataTable.isDataTable('#myTable') ) {
+      $('#myTable').DataTable().destroy();
+      $('#myTable').empty();
+    }
+    console.log('deleted table')
+    var table = $(document).ready(function() {
+      $('#myTable').DataTable({
+        "pageLength": 20,
+        data: tableData,
+        columns: [
+          { title: "Smiles" },
+          { title: "Name" },
+          { title: "Tanimoto" }
+        ],
+        order: [[2, 'desc']]
+      });
+    });
+  }
+
+  function showPiccies() {
+    tableData.sort(function(a,b){return b[2].localeCompare(a[2]);});
+    console.log('sorted it')
+    for (let i = 0; i < 12; i++) {
+      const smiles = tableData[i][0];
+      const name = tableData[i][1];
+      lewDraw(smiles, "nearestMol"+i, name, inline=true)
+    }
+  }
+
+</script>
+
+
+<body>
+  <div class="container-fluid col-md-8">
+    <h1>RDKitJS PDBsim</h1>
+    <div id="molecule">
+      <div id="drawing"></div>
+    </div>
+    <br>
+    SMILES: <input id="smiles_input" type="text" value="COc1ccc2n(c(C)c(CC(O)=O)c2c1)C(=O)c3ccc(Cl)cc3" autocomplete="off" onkeyup="lewDraw(this.value)">
+    <br>
+
+  <h1>Find similar PDB ligands</h1>
+  Input a SMILES code for a query molecule above (default is indomethacin). Then click 'Fingerprint Mols' below to parse the SMILES codes of drug-like PDB mols and fingerprint them (it only needs to be pressed once, and takes 15-20s). Afterward, click 'Calculate Similarities' to populate a table of the PDB molecules ordered by similarity to the query. You can change the query and repopulate the table without fingerprinting again.
+  <br>
+  <br>
+  Below the table, click "Show Pics" to view the top-12 most-similar compounds. You'll need to update these when after recalculating similarities for a new query.
+  <br>
+  </div>
+<br>
+<div class="container">
+  <button id="fp-mols", onclick="fingerprintMols()">Fingerprint Mols</button>
+  <button id="calc-sim", onclick="buildTable()">Calculate Similarities</button>
+  <table id="myTable" class="cell-border compact stripe", width="50%">
+    <thead>
+      <tr>
+        <th>Smiles</th>
+        <th>Name</th>
+        <th>Tanimoto</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Table rows will be added dynamically by JavaScript -->
+    </tbody>
+  </table>
+  <button id="show-pics", onclick="showPiccies()">Show Pics</button>
+  <div class="row">
+      <div id="nearestMol0" class="column"></div>
+      <div id="nearestMol1" class="column"></div>
+      <div id="nearestMol2" class="column"></div>
+      <div id="nearestMol3" class="column"></div>
+      <div id="nearestMol4" class="column"></div>
+      <div id="nearestMol5" class="column"></div>
+      <div id="nearestMol6" class="column"></div>
+      <div id="nearestMol7" class="column"></div>
+      <div id="nearestMol8" class="column"></div>
+      <div id="nearestMol9" class="column"></div>
+      <div id="nearestMol10" class="column"></div>
+      <div id="nearestMol11" class="column"></div>
+    </div>
+  </div>
+  </div>
+  <script>
+  </script>
+</body>
+</html>
+

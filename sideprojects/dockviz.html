@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Docking curation using py3dmol and streamlit </h1>
+  <a href="https://github.com/ljmartin/dockviz">Github repo</a><br>
+  <a href="https://share.streamlit.io/ljmartin/dockviz/main/stApp.py">View the app</a><br>
+
+  <p>Docking has been used for discovery of new scaffolds for a while now, but is really becoming popular with the combination of ultra-large scale docking libraries and some high-profile examples (such as <a href="https://doi.org/10.1038/s41586-019-0917-9">Lyu et al</a>, or <a href="https://doi.org/10.7554/eLife.53779">Patel et al</a>).
+
+  <p>While it would be nice to have a list of predictions that are generated completely by the docking algorithm, it pays to manually inspect the top-scoring docked poses and use your expert experience to prioritise the most likely hits. To see how this improves hit-rate, see <code>Extended Data Fig. 7</code> from Lyu et al above. It looks like the very high-scoring ligands from UCSF DOCK somehow hack the scoring function, and get extra benefit from manual curation: 
+
+    <center><img src="./pics/hit-rate.png", width="300"></center>
+
+  <p>Typically, manual curation entails visualizing the docked pose, looking for strain in the ligand structure, overlap against an existing known (crystallized) ligand, or pharmacophoric interactions that look promising. This requires a bit of domain knowledge: chemical, medicinal chemical, structural biology, pharmacology, as well as the history of the target and the known drugs.
+
+  <p>To that end, I coded up an applet to visualize a receptor, the crystallized ligand, and an example list of docking predictions. The docking predictions were 5 ligands from Lyu et al, docked against the D4 receptor (5WIU) using <b>smina</b>. It's mind-blowing to me how easily all the open-source compchem tools work together: <b>streamlit</b> to make a jazzy browser app, <b>py3dmol</b> to visualize the receptor, ligands, and pharmacophores, and <b>rdkit</b> to handle the ligand molecules and calculate pharmacophores. Even the docking itself could be done inside a streamlit app by calling <b>smina</b>. 
+
+  <p>It really seems like a golden age for compchem! I didn't write the tools, only sewed them together, so I can't take credit for it - but this applet took a weekend to write and IMO could easily recapitulate the function of any professional compchem visualization software. This could be further extended to calculate interaction energies using OpenMM. 
+
+  <p>If you want to use this tool in your own research and need a particular feature, reach out and I'd be happy to help customize it.
+    
+    <center><img src="./pics/dockviz.png", width="400"></center>
+
+    
+
+    
+
+   

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+
+	<!-- twitter card:-->
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@lewischewis" />
+        <meta name="twitter:title" content="Title goes here" />
+        <meta name="twitter:description" content="Subtitle goes here" />
+        <meta name="twitter:image" content="" />
+        <meta name="twitter:image:alt" content="Description goes here"/>
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> How many atom types are there? </h1>
+  A big part of computational chemistry is blocking atoms into 'types'. For example: additive MD forcefields (think CHARMM, AMBER, OPLS, GROMOS) typically define various atom types - each one has parameters that describe the interaction strength with the other atom types, forming a large pairwise table of possible interactions. A more accessible version of this is docking atom types - AutoDock, for example, <a href="">groups atoms into 29 types</a>. The AutoDock Vina paper has a good description of the different combination rules. At a minimum, almost everyone in compchem will be familiar with hydrogen-bond donors and acceptors - it doesn't matter if the number of protons in the atom is 7 (N) or 8 (O), for example, if they both bond with the protein backbone in the same way.
+
+  Note: an alternative way to describe this is 'atom invariant' - i.e. some definition is applied such that two atoms, in different sets, are described in an invariant way because their immediate environment is the same. 
+  
+  Some machine learning works create their own atom invariants based on arbitrary descriptions, which may not serve their purposes. For example, [molecule attention network citation]
+
+  The other extreme is to enumerate all possible atom invariants. Some of these won't be useful for bioactivity predction, though.
+
+  A middle ground might be to enumerate all possible atom invariants that occur in known bioactive molecules. To that end, Pat Walters recently posted a handy SQL query to the RDKit mailing list that retrieves down oral drugs. In combination with this, in the past couple of years the RDKit contributors have added a function to identify the underlying atoms that contribute to a fingerprint bit. We can combine these to empirically determine all the probable atom invariants  occurring in drug molecules. 
+
+
+  <pre>
+    <code>
+      import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+#wpwalter's ligands:
+df = pd.read_csv('https://raw.githubusercontent.com/PatWalters/datafiles/main/chembl_drugs.smi', 
+                 sep=' ',
+                header=None,
+                names=['smiles', 'cid'])
+
+df['mols'] = df.apply(lambda x: Chem.MolFromSmiles(x['smiles']), axis=1)
+
+
+def getbits(mol):
+    bi = {}
+    fp = AllChem.GetMorganFingerprint(mol, 0, bitInfo=bi,useFeatures=False)
+    return list(bi.keys())
+
+bits = []
+for m in df['mols']:
+    bits +=  getbits(m)
+
+values, counts = np.unique(bits, return_counts=True)
+print("Number of 0-radius atomic subgraphs:", len(values))
+print("Counts of subgraphs:")
+      print(counts)</pre>
+  </code>
+
+  output:
+  <pre>
+</code>
+Number of 0-radius atomic subgraphs: 76
+Counts of subgraphs:
+[   1    1    2    1   14   40    1   42    1   12  286  376   32  180
+    1   13  629   80  444    3  971  153  182    1   38  168   14    1
+  200  220    8    8   29    1  401   13  510    8   10  230  379  192
+  778   18   67    1  701  141  910   32   14  611  515  252  234 1083
+ 1021    1    1  107    1    1   11    8   15   72    1    7    1    7
+    1   18   15    2    1    1]
+
+1
+</pre>
+</code>
+  <h2>Subheader</h2>
+  <a href="https://www.example.com/g">Example domain</a><br>
+  Explanation text. 
+
+  
+ 

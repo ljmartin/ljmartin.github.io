@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2021-10-12">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+
+	<meta name="twitter:card" content="summary"></meta>
+        <meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Preparing protein PDBs for docking"></meta>
+        <meta name="twitter:description" content="Using Prody, PDBFixer, qrotate, and OpenMM"></meta>
+	
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Preparing protein PDBs for docking </h1>
+  <p><a href="https://github.com/ljmartin/pdb_to_pdbqt">Repo</a><br>
+    <a href="https://github.com/ljmartin/pdb_to_pdbqt/blob/main/pdb_to_pdbqt.ipynb">Notebook</a></br>
+  <p>Recently <a href=https://chemrxiv.org/engage/chemrxiv/article-details/6107fc3340c8bd01539a36f4>'DockStream'</a> was released, some software from a team at AstraZeneca that is used for driving reinforcement learning models to generate molecules that dock well. Part of the pipeline is preparing PDB files for docking. 
+
+  <p>This post is to share my workflow for preparing PDB files. Like DockStream, it uses <a href="https://github.com/openmm/pdbfixer">PDBFixer</a>. In addition to that, it aligns the target coordinates along the principal moment of inertia of the ligand - doing this means the docking box axes are aligned to the xyz axes, so you can cover the ligand cavity totally with a smaller volume, reducing docking time slightly. The actual conversion to PDBQT is a relatively small step, since OpenBabel does this reliably in a one-liner from the CLI. 
+
+  <p>In addition, it also demonstrates further processing with OpenMM. PDB files often have issues such as missing atoms and bonds, and PDBFixer interprets those correctly based on known bonding templates for protein residues. However, sometimes the coordinates are nonphysical, which requires minimization via a forcefield. I've noticed that minimization in the absence of a bound ligand can 'crush' the binding cavity, so it helps to have the ligand present. This then requires new parameterization of the ligand for treatment by the forcefield! Luckily the OpenMM folks thought of that and provide <a href="https://github.com/openmm/openmmforcefields">openmmforcefields</a>. The script chooses GAFF as the parameterization algorithm. 
+
+    <p>The system prepared in this way could also go directly into MD, and this is a perfectly valid way to take a docked ligand into MD as well, right after <a href="https://ljmartin.github.io/sideprojects/pdbqt_to_mol.html">Matching Bond Topology to PDBQT Files</a>.  
+  
+
+  
+
+  
+ 

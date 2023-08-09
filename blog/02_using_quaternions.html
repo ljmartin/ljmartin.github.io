@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2021-02-11">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Ligand overlay 1: using quaternions for rotation in python </h1>
+  <a href="https://github.com/ljmartin/align/blob/main/0.1%20-%20quaternions%20for%20rotation.ipynb">Notebook on github - Step 1 rotating with quaternions</a>
+  
+  <p>The <a href="https://pubs.acs.org/doi/10.1021/jm0603365">twin pillars of structure-based</a> drug discovery are 1) <b>docking</b> (fitting test ligands into a known binding site), and 2) <b>ligand overlay</b> (fitting test ligands into the shape of a known ligand). The academic literature seems to focus on machine learning approaches to virtual screening, using ML based on fingerprints or molecular graphs. But docking and ligand overlay, which were originally developed in the 90s (!), have already shown good results over the previous two decades. They may get less attention in the literature today because, as a result of their success, the developers moved into industry. See <a href="https://www.cresset-group.com/software/blaze/">Blaze (overlay)</a>, <a href="https://www.eyesopen.com/rocs">ROCS (overlay)</a>, or <a href="https://www.schrodinger.com/products/glide">Glide (docking)</a>. </p>
+
+  <p>I've been determined to implement one of these approaches in an open-software way for months, but the implementations are licensed, obscured as trade secrets or, due to historical reasons, written in fortran. While fortran is great, it doesn't fit into modern drug discovery pipelines easily and it would be nice to have a python option. Docking and ligand overlay share a lot of properties, but ligand overlay seems like the simpler place to start since the protein is absent, meaning there are fewer parameters to deal with.</p>
+
+  <p>A reasonable roadmap to implementing a ligand overlay pipeline might look like this:
+    <ul>
+      <li>(This post) Figure out how to handle molecule rotations using quaternions, which have some advantages over rotation matrices</li>
+      <li>Align molecules by their principal moments of inertia, which is typically close to the global minimum of volume overlap</li>
+      <li>Calculate molecular volume, as well as volume overlaps. Hard-sphere, Gaussian, or solvent-excluded volumes?</li>
+      <li>Optimize the overlap function between two molecules using gradient-descent or some evolutionary algorithm like CMA-ES</li>
+      <li>Validate on some high-throughput screening data or the <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.0c00598">DUD-Z</a> validation set. This approach should also be compared to molecular fingerprits or alignment-free shaped-based descriptors to show improvement</li>
+      <li>Optimize timing</li>
+    </ul>
+
+  <p>The first step - quaternions - is simple enough in practice, but isn't commonly taught in undergrad maths. Luckily, it's common in computer graphics so there's lots of information and some python libraries that demonstrate how it works. The advantage of using quaternions instead of a rotation matrix is that they have gradients without singularities, it's straightforward to interpolate between two rotations, and multiple rotations can be stacked by multipling quaternions (a computationally cheaper operation than matrix multiplication).
+
+  <p>See the notebook above for some functions that demonstrate how to use quaternions in python. These just use numpy, so should be differentiable using JAX. Later, they will be utilized to optimize the overlap between two molecules. As a sanity check, they are also used to create the following graphic of random molecule rotations. Looks like it works!
+
+    <center><img src="./pics/molrot.png", width="300"></center>
+
+  
+ 

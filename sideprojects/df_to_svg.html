@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Tables with jupyter formatting </h1>
+  <a href="https://github.com/ljmartin/df_to_svg">Github repo</a><br>
+    <p>Jupyter notebooks have really nice table formatting (it doesn't come from pandas). Is there a way to export a pandas table to image, in the style of Jupyter notebook, to <code>.svg</code>, and without any external libaries? Yes.</p>
+
+  <p>Why?</p>
+  <ul>
+    <li> it's easier to copy and paste a table into Word as an image file rather than enter individual elements</li>
+    <li> Jupyter notebook formatting is really nice</li>
+    <li> pandas can export to LaTeX fine, as well as HTML with nice formatting, but it doesn't export directly to <code>.png</code> or, even better, <code>.svg</code>. There is a project (<a href="https://github.com/dexplo/dataframe_image">dataframe_image</a>) that converts tables to <code>.png</code> in the style of a Jupyter notebook, but it requires Chrome running in headless mode, and it doesn't export to <code>.svg</code>.</p>
+</ul>
+
+  <p>The Formatting is easy to emulate in <code>.svg</code>, after all it's just rectangles, lines, and text. For an example see the below - it's not a screenshot of a rendered pandas dataframe, but is an <code>.svg</code> file made to look like the same thing.</p>
+
+  <p>The code in the repo above can process any dataframe in this way, with no external libraries required.
+
+    <center><img src="https://raw.githubusercontent.com/ljmartin/df_to_svg/main/code/svg_directly.svg"></center>
+
+  <p>P.S. why <code>.svg</code>? It's the natural choice for a table - it's high (infinite) resolution, low file size, and supports text highlighting. Also it's just a bunch of rectangles, lines, and text, just like a table. 
+
+  
+  

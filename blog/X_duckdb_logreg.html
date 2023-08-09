@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	    <meta name="twitter:card" content="summary" />
+	    <meta name="twitter:site" content="@lewischewis" />
+        <meta name="twitter:title" content="Visualizing crystal contacts" />
+        <meta name="twitter:description" content="on KRAS using PDBe-Molstar" />
+
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Logistic regression on Morgan fingerprints with DuckDB </h1>
+  <p>
+    A great gotcha in structure-based hit discovery is when a binding site or bound ligand is affected by crystal contacts. Crystal contacts here refers to  adjacent protein molecules contacting each other in the crystal used for X-ray crystallography in a way that would not happen in solution. While having some contacts is normal, they become problematic when they distort the ligand or surrounding protein.
+
+
+    <p><b>Alternatives:</b> I often just open a <a href="https://embed.plnkr.co/plunk/094fAnyWsuQVtYja">pdbe-molstar plunker</a>, change the pdb code, and add <code>defaultCell: 'unitPreset'</code>. That isn't secure, and requires internet. <a href="https://pymolwiki.org/index.php/Symexp">PyMol has</a> a <code>symexp</code> command if you can bare to use it, and <a href="https://www.cgl.ucsf.edu/chimerax/docs/user/tools/crystalcontacts.html">ChimeraX has</a> a crystal contacts tool as well, but the resulting visualization can churn through CPU.  

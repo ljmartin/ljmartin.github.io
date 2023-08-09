@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2023-04-05">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	    <meta name="twitter:card" content="summary"></meta>
+	    <meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Rendering with Fresnel"></meta>
+        <meta name="twitter:description" content="Quality path tracing in real time"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Rendering with Fresnel </h1>
+  <a href="https://gist.github.com/ljmartin/523fefaf2528ab84be3e1868136b5852#file-molecules_with_fresnel-ipynb">Link to the Gist</a>
+  <p>
+    It's convenient to have a nice rendering tool for molecular systems. ChimeraX is the best GUI option hands down, but sometimes a scripted option is better because it's shareable, repeatable and often more customisable. The <a href="https://github.com/glotzerlab/fresnel">Fresnel library</a> is a great option for python.
+
+  <p>
+    This is a short post just to show how Fresnel works (see Gist below). I wrote this example code a couple of years ago, and tested it yesterday -  it's still current. One nice thing about rendering proteins from scratch is that it really forces you to realise that the core of computational med-chemistry is just a bunch of <code>3 x n_atoms</code> arrays, to represent the xyz coordinates, and <code>n_atoms x n_atoms</code> arrays for the bonding/adjacency matrix. Realising this takes one from using tools towards writing tools. 
+
+
+    <script src="https://gist.github.com/ljmartin/523fefaf2528ab84be3e1868136b5852.js"></script>

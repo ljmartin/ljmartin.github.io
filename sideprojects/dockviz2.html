@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+
+	<!-- twitter card:-->
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@lewischewis" />
+        <meta name="twitter:title" content="Docking curation in the browser with PDBe-Molstar" />
+        <meta name="twitter:description" content="Using a MolStar plugin" />
+        <meta name="twitter:image" content="" />
+        <meta name="twitter:image:alt" content="A visualization of the crystal structure of Neurokinin 1 bound to a small molecule"/>
+	
+	<link rel="stylesheet" type="text/css" href="https://www.ebi.ac.uk/pdbe/pdb-component-library/css/pdbe-molstar-1.1.0.css">
+	<script type="text/javascript" src="https://www.ebi.ac.uk/pdbe/pdb-component-library/js/pdbe-molstar-plugin-1.1.0.js"></script>
+	<style>
+      #myViewer{
+        float:middle;
+        width:500px;
+        height: 500px;
+        position:relative;
+      }
+    </style>
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Docking curation in the browser with PDBe-Molstar </h1>
+  <a href="https://github.com/PDBeurope/pdbe-molstar">PDBe-Molstar repo</a><br><br>
+
+  <p>The original <a href="https://ljmartin.github.io/sideprojects/dockviz.html">dockviz</a> proved very useful for me. It used <code>py3Dmol</code> wrapped in <code>streamlit</code> to show the viewer to a user. On the other hand, this meant a no-code wrapper to expose a visualization to the browser (streamlit), where the visualization used a python wrapper (py3Dmol) to expose a javascript library (3dmol.js). That's a bit circuitous. It helped when using python libraries like the RDKit and mdtraj, but starts to get unwieldy - particularly when drawing interactions (e.g. H-bonds, pi-pi stacking) - which required yet another library to calculate interactions, followed by passing the interaction coordinates back to py3Dmol to draw arrows or dotted lines. When chopping and changing between views, this can also get laggy. 
+
+  <p>I'd like to see if this can be done in a simpler, unified way. <a href="https://github.com/molstar/molstar">Mol* (Molstar)</a>, is a powerful javascript library for protein visualization that has all the tools for visualizing interactions baked in. It's also very fast with slick GPU rendering. But! Since it's javascript, for simple python folk like myself it's almost impenetrable. Luckily a helpful developer for the <a href="https://github.com/PDBeurope/pdbe-molstar">PDBe made a plugin that is comparatively simple to implement</a>. It doesn't even require a local install - the dot js file is available on the www.ebi.ac.uk website, equivalent to a cdn.</p>
+
+  <p>The visualization below demonstrates PDBe-Molstar using a structure of the Neurokinin 1 receptor bound to a small molecule (I chose this since it shows a few different types of medicinal chemistry interactions - hbonding, pi-pi stacking, and pi-cation). Click the buttons below to drive the viewing style. The main button to try is the <b>Focus on Ligand</b> button, which automatically shows interaction bonds as well as sidechain and backbone atoms of nearby residues to the ligand.</p>
+
+  <p>To see how to achieve this yourself, view the source of this page - it's all pretty basic html and some javascript. The wiki in the PDBe-Molstar repo linked above also has great examples of more buttons. I imagine there's a lot more in there for someone who reads javascript.</p>
+
+  <h4>Press these buttons to control the visualization:</h4>
+  <button onclick="viewerInstance.canvas.setBgColor({r:255, g:255, b:255})">White background</button>&nbsp;
+  <button onclick="viewerInstance.canvas.setBgColor({r:0, g:0, b:0})">Black background</button>&nbsp
+  <button onclick="
+		   const loci = viewerInstance.getLociForParams([{ label_comp_id:'GAW' }]);
+		   if(!loci || loci.kind === 'empty-loci' ) return;
+		   viewerInstance.plugin.managers.structure.focus.setFromLoci(loci);
+		   viewerInstance.plugin.managers.camera.focusLoci(loci);
+		   ">Focus on Ligand</button>&nbsp
+  <button onclick="viewerInstance.visual.reset({theme: true, camera:true})">Reset view</button><br><br>
+
+  <h4>Visualization:</h4>
+  <div id="myViewer"></div>
+  <script>
+
+      //Create plugin instance
+      var viewerInstance = new PDBeMolstarPlugin();
+  
+      //Set options (Checkout available options list in the documentation)
+      var options = {
+        moleculeId: '6hlp',
+          hideControls: true,
+	  hideStructure: ['carbs', 'water'],
+	  bgColor: {r:255, g:255, b:255}
+	  //ligandView:{label_comp_id: "JC9"}
+
+      }
+      
+      //Get element from HTML/Template to place the viewer 
+      var viewerContainer = document.getElementById('myViewer');
+  
+      //Call render method to display the 3D view
+      viewerInstance.render(viewerContainer, options);
+      
+  </script>
+
+
+  <p>Bonus: PBDe have a bunch more plugins: <a href="https://www.ebi.ac.uk/pdbe/pdb-component-library/index.html">see here</a>. Looks like RDKit also has a javascript library <a href="http://rdkit.blogspot.com/2019/11/introducing-new-rdkit-javascript.html">(link)</a>. No python needed. 
+
+</body>
+   

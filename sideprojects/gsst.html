@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+</head>
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Generalized serial simulated tempering in OpenMM </h1>
+  <a href="https://github.com/ljmartin/generalized_tempering">Github repo</a><br>
+
+  <p>OpenMM already has a great script for simulated tempering. With most system sizes these days, though, sampling across a wide temperature range is really slow due to the poor scaling. Alternatively some subset of the system can be tempered, like in solute tempering (typically associated with replica exchange, rather than serial tempering).</p>
+
+  <p>This project aimed to adapt the existing simulated tempering script to use solute tempering. This could be used in situations where, like me, you only have a normal number of GPUs available and mass parallelization isn't really achievable.</p>
+
+  <p>Once solute tempering was in place, it only made sense to generalize it so any configurational or potential-energy-based coordinate could be tempered, hence 'generalized serial simulated tempering'. See the repo for more details and to make this graph, which compares free energy estimates from MBAR and generalized tempering:
+
+    <center><img src="https://raw.githubusercontent.com/ljmartin/generalized_tempering/master/na_cl_pmf/wl_freenrg.gif", width="300"></center>
+
+  <p>Ultimately, any enhanced sampling technique that relies on learned weights has limited utility. Most processes worthwhile studying will be on the edge of possible sampling requirements. Since serial tempering typically consists of an equilibration phase (to learn the weights) followed by a production phase (to sample the system), commonly the interesting events will occur once the weights have already been fixed. This will correspond to a change in the potential energy, immediately making the learned weights inaccurate. On-the-fly weight adjustment schemes are possible, but in the end replica-exchange is much more useful for slow processes since it is weight-free.
+
+  <p>Still, for fast degrees of freedom where the free energy is the desired end-product, as opposed to enhanced sampling of some slow orthogonal degree of freedom, GSST can be a viable alternative to MBAR. 
+
+   
