@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2023-08-11">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	    <meta name="twitter:card" content="summary"></meta>
+	    <meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Creating an RSS feed"></meta>
+        <meta name="twitter:description" content="directly from html with python"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Creating an RSS feed from HTML in python </h1>
+  Copy and paste into your RSS reader, or <a href='https://ljmartin.github.io/blog/feed.xml'>click this</a>, to add the blog: https://ljmartin.github.io/blog/feed.xml
+  <p>
+    As (some) people (like me) use Twitter less, I wanted a better way to share blog entries. Recently I've been following blogs on a free, open-source RSS reader called <a href='https://netnewswire.com/'>NetNewsWire</a>, so it makes sensse to start an RSS feed, too.
+
+  <p>
+    This blog is built using emacs: I copy an html file and edit the fields for each entry. That means there's no associated RSS feed. A million tools purport to automate this but none worked for me, until I found <a href='https://mchartigan.github.io/blog/20220118.html'>this helpful post</a>. It uses a <a href='https://github.com/svpino/rfeed'>9 year old python script</a> that's been maintained this whole time. 
+
+  <p>
+    So here's what this looks like. Hopefully it's useful for someone else too:
+
+    <pre>
+from bs4 import BeautifulSoup   # HTML parser
+from rfeed import *   # RSS generator
+from datetime import datetime
+import os
+import re
+
+# Get all the HTML files in the blog section
+dirname = '/Users/ljmartin/Documents/GitHub/ljmartin.github.io/blog/'
+htmls = [x for x in os.listdir("dirname") if x.endswith('.html')]
+htmls.sort(reverse=True) # sort newest to oldest
+
+#add each blog item:
+items = []
+for f in htmls:
+ 
+    #make sure the file has the pattern '15_rss.html'
+    if not re.search('[0-9][0-9]_*', f):
+        continue
+        
+    print(f)
+    with open('/Users/ljmartin/Documents/GitHub/ljmartin.github.io/blog/'+f) as of:
+        soup = BeautifulSoup(of, 'html.parser')
+        txt = soup.find_all('main')[0]
+        t = soup.find('meta', attrs={"itemprop": "datePublished"})
+        date = t['content']
+        items.append(
+            Item(
+                author = 'Lewis J. Martin',
+                pubDate = datetime.strptime(date, '%Y-%m-%d'),
+                description = txt
+            ))
+        
+        
+#wrap it into a 'feed'
+feed = Feed(
+    title = 'LJM CompMedChem',
+    link = "https://ljmartin.github.io/",
+    items = items,
+    description = 'Sideprojects and code snippets for compchemistry'
+)
+
+#and write:
+rss = feed.rss().replace("–", "--")     # replace hyphens with readable char
+# write RSS feed to feed.xml
+with open("feed.xml", "w") as file:
+    file.write(rss)
+    </pre>

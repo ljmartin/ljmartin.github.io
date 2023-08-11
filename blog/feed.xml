@@ -1,5 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>LJM CompMedChem</title><link>https://ljmartin.github.io/</link><description>Sideprojects and code snippets for compchemistry</description><generator>rfeed v1.0.0</generator><docs>https://github.com/svpino/rfeed/blob/master/README.md</docs><item><description>&lt;main&gt;
+&lt;h1&gt; Creating an RSS feed from HTML in python &lt;/h1&gt;
+  Copy and paste into your RSS reader, or &lt;a href="https://ljmartin.github.io/blog/feed.xml"&gt;click this&lt;/a&gt;, to add the blog: https://ljmartin.github.io/blog/feed.xml
+  &lt;p&gt;
+    As (some) people (like me) use Twitter less, I wanted a better way to share blog entries. Recently I've been following blogs on a free, open-source RSS reader called &lt;a href="https://netnewswire.com/"&gt;NetNewsWire&lt;/a&gt;, so it makes sensse to start an RSS feed, too.
+
+  &lt;p&gt;
+    This blog is built using emacs: I copy an html file and edit the fields for each entry. That means there's no associated RSS feed. A million tools purport to automate this but none worked for me, until I found &lt;a href="https://mchartigan.github.io/blog/20220118.html"&gt;this helpful post&lt;/a&gt;. It uses a &lt;a href="https://github.com/svpino/rfeed"&gt;9 year old python script&lt;/a&gt; that's been maintained this whole time. 
+
+  &lt;p&gt;
+    So here's what this looks like. Hopefully it's useful for someone else too:
+
+    &lt;pre&gt;
+from bs4 import BeautifulSoup   # HTML parser
+from rfeed import *   # RSS generator
+from datetime import datetime
+import os
+import re
+
+# Get all the HTML files in the blog section
+dirname = '/Users/ljmartin/Documents/GitHub/ljmartin.github.io/blog/'
+htmls = [x for x in os.listdir("dirname") if x.endswith('.html')]
+htmls.sort(reverse=True) # sort newest to oldest
+
+#add each blog item:
+items = []
+for f in htmls:
+ 
+    #make sure the file has the pattern '15_rss.html'
+    if not re.search('[0-9][0-9]_*', f):
+        continue
+        
+    print(f)
+    with open('/Users/ljmartin/Documents/GitHub/ljmartin.github.io/blog/'+f) as of:
+        soup = BeautifulSoup(of, 'html.parser')
+        txt = soup.find_all('main')[0]
+        t = soup.find('meta', attrs={"itemprop": "datePublished"})
+        date = t['content']
+        items.append(
+            Item(
+                author = 'Lewis J. Martin',
+                pubDate = datetime.strptime(date, '%Y-%m-%d'),
+                description = txt
+            ))
+        
+        
+#wrap it into a 'feed'
+feed = Feed(
+    title = 'LJM CompMedChem',
+    link = "https://ljmartin.github.io/",
+    items = items,
+    description = 'Sideprojects and code snippets for compchemistry'
+)
+
+#and write:
+rss = feed.rss().replace("--", "--")     # replace hyphens with readable char
+# write RSS feed to feed.xml
+with open("feed.xml", "w") as file:
+    file.write(rss)
+    &lt;/pre&gt;
+&lt;/p&gt;&lt;/p&gt;&lt;/p&gt;&lt;/main&gt;</description><author>Lewis J. Martin</author><pubDate>Fri, 11 Aug 2023 00:00:00 GMT</pubDate></item><item><description>&lt;main&gt;
 &lt;h1&gt; Rendering with Fresnel &lt;/h1&gt;
 &lt;a href="https://gist.github.com/ljmartin/523fefaf2528ab84be3e1868136b5852#file-molecules_with_fresnel-ipynb"&gt;Link to the Gist&lt;/a&gt;
 &lt;p&gt;
