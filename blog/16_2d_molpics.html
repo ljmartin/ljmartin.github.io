@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2023-08-11">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	    <meta name="twitter:card" content="summary"></meta>
+	    <meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Plotting RDKit mols"></meta>
+        <meta name="twitter:description" content="in matplotlib"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Plotting RDKit mols </h1>
+  <a href='https://gist.github.com/ljmartin/6b993e7abb475dceb8caad04d5788167'>link to gist</a>
+  <p>
+    Most modelling tasks in comp/med chem are inherently 3D, but I find it much easier to develop in 2D. The main reason for this is that plotting in 3D is unfortunately difficult in a jupyter shell. On the other hand, plotting in 2D is easy with matplotlib, and with numpy a lot of the code will look the same in 2D vs 3D if it's been vectorized. 
+
+  <p>
+    Still, when interacting with the RDKit, it's not obvious how to 'plot' a structure in matplotlib. So here's an example of how to plot an RDKit image of a 2D conformer onto a matplotlib figure.
+
+  <p>
+    This example also shows why this is useful - in this case, it samples scattered points on a vDW surface, then expands the vDW surface to the solvent-accessible surface, and then calculates the 'SASA' in 2D. With a little bit of tinkering, this code would work in 3D, too, which will be the topic of the next, more detailed, blog post. 
+
+
+<script src="https://gist.github.com/ljmartin/6b993e7abb475dceb8caad04d5788167.js"></script>
