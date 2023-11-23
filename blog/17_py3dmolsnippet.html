@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2023-11-24">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	    <meta name="twitter:card" content="summary"></meta>
+	    <meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Py3DMol snippet"></meta>
+        <meta name="twitter:description" content="I need it all the time but keep forgetting it"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Plotting RDKit mols </h1>
+  <p>
+    This snippet isn't very advanced, and I've seen several flavours of it around. Nevertheless I need it all the time, and always forget it - here's a copy so I know where to find it, and you might find it helpful, too. It overlays 3D RDKit molecules using py3Dmol with optional colouring or conformer information. 
+  <p>
+    <pre>
+      
+ import py3Dmol
+ def viewProt(mol, view=None, color='orange',confid=0):
+     if view is None:
+         view = py3Dmol.view()
+     view.addModel(Chem.MolToMolBlock(mol,confId=confid), "sdf")
+
+     model = view.getModel()
+     model.setStyle({}, {"stick": {"colorscheme": f"{color}Carbon"}})
+     view.zoomTo()
+     return view
+
+</pre>
+
+<p>
+    Here's how to draw a pocket and ligand:
+
+<pre>
+      
+ view = viewProt(pocket)
+ view = viewProt(ligand, view=view, color='green')
+ view #output the view at the end of a jupyter notebook cell to render
+
+</pre>
+
+<p>
+      Draw hydrogen bonds:
+
+      <pre>
+        
+ view = viewProt(pocket)
+ #get hbonds from somewhere (future blog post!),
+ #e.g. np.array([[hbd_idx, hba_idx, angle], [...]])
+ hbonds_arr = ...
+ xyz = pocket.GetConformer(0).GetPositions()
+ for hbd, hba in zip(hbonds_arr[:,0], hbonds_arr[:,1]):
+     view.addCylinder({'color':'darkblue',
+                 'start':{'x':xyz[hbd][0],'y':xyz[hbd][1],'z':xyz[hbd][2]},
+                 'end':{'x':xyz[hba][0],'y':xyz[hba][1],'z':xyz[hba][2]},
+                 'radius':0.1, 'dashed':True});
+ view 
+
+</pre>
+
+<p>
+        Highlight some atoms:
+
+<pre>
+
+ for idx in atoms_of_interest_indices:
+     view.addSphere({'radius':1, "center":{"x":xyz[idx][0], "y":xyz[idx][1], "z":xyz[idx][2]},
+         "wireframe":True, "color":"pink"})
+ view
+
+</pre>
+
+<p>
+        Overlay conformers of a molecule:
+
+<pre>
+
+  core = Chem.MolFromMolFile(....)
+  ms = []
+  for i in range(10):
+      m = Chem.MolFromSmiles('...')
+      mH = Chem.AddHs(m)
+      AllChem.ConstrainedEmbed(mH, core)
+      ms.append(mH)
+  view = viewProt(ms[0])
+  for i in range(1,10):
+      view = viewProt(ms[i], confid=i)
+  view
+
+</pre>
