@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2023-11-24">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	    <meta name="twitter:card" content="summary"></meta>
+	    <meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Hbonds in rdkit"></meta>
+        <meta name="twitter:description" content="and numpy"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Hbonds with rdkit and numpy </h1>
+  <a href="https://gist.github.com/ljmartin/3cfe0368209a0cc991b8fc5821257f3d">Gist link</a>
+  <p>
+    There are several tools to calculate hydrogn bonds (eg biotite, mdtraj, mdanalysis), but they don't have the perfect combination of features for me: speed, playing nice with rdkit, and tuneable atom perception via SMARTS definitions of donor/acceptor types.
+
+    <p>As an example of what doesn't work for me, I'll use a library that is clearly very good for it's intended purpose. MDTraj is fast for calculating HBonds in a molecular dynamics trajectory with a million frames. However, to do the same thing on a million docked or otherwise modelled protein-ligand structures would require a million conversions from rdkit to PDB to mdtraj topology, wasting time.
+
+    <p>So here's how to do it directly from rdkit with numpy. This function takes about 600 µs after loading and preparing the rdkit molecules (with Chem.Combine and Chem.Sanitize), which seems fast enough for my purposes. There's an example here of how to draw hydrogen bonds with py3Dmol too: 
+    
+  <p>
+
+    <script src="https://gist.github.com/ljmartin/3cfe0368209a0cc991b8fc5821257f3d.js"></script>
+    
