@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>File Drop Example</title>
+  <style>
+    html, body {
+      .main-container {
+        display: flex;
+        height: 100%;
+      }
+      
+      .main-content {
+        flex-grow: 1;
+        padding: 10px;
+      }
+      
+      .sidebar {
+        width: 300px;
+        background-color: #f0f0f0;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.rawgit.com/arose/ngl/v2.0.0-dev.31/dist/ngl.js"></script>
+  <script src="https://unpkg.com/@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js"></script>
+  
+  <div class="main-container">
+    <div class="main-content">
+      <div id="fileDropBox1" style="width: 300px; height: 50px; border: 1px dashed #ccc; display: inline-block;">Drop protein PDB here</div>
+      <div id="fileDropBox2" style="width: 300px; height: 50px; border: 1px dashed #ccc;">Drop multi-mol SDF here</div>
+      <button id="actionButton" disabled>Ready SDF</button>
+      <hr>
+      <div id="viewport" style="width:100%; height:650px;"></div>
+    </div>
+    <div class="sidebar">
+      <h2>Molecule Bar</h2>
+      <button id="renderButton" disabled>Render in NGL</button>
+      <div id="mol2dPic"></div>
+      <button id="prev" disabled>Prev</button>
+      <button id="next" disabled>Next</button>
+      <div id="molProps"></div>
+      <!-- Your sidebar content goes here -->
+    </div>
+  </div>
+  <script>
+    const fileDropBox1 = document.getElementById("fileDropBox1");
+    const fileDropBox2 = document.getElementById("fileDropBox2");
+    const actionButton = document.getElementById("actionButton");
+    const renderButton = document.getElementById("renderButton");
+    const nextButton = document.getElementById("next");
+    const prevButton = document.getElementById("prev");
+    
+    let startCol1 = fileDropBox1.style.border;
+    let startCol2 = fileDropBox1.style.border;
+    let box1Done = false;
+    let box2Done = false;
+    let blob1, blob2;
+    let sdfContent = []
+    let pdbContent;
+    let currMol = 0;
+
+    //Very first thing, init the packages we need.
+    //It takes a few seconds to do this, so start now.
+    //The user will be busy selecting files anyway.
+    var stage = new NGL.Stage("viewport"); //NGL
+    stage.handleResize();
+    
+    onRuntimeInitialized: initRDKitModule().then(function(instance) { //RDKit with wasm via emscripten
+      RDKitModule = instance;
+     }); 
+
+    function drawMol(molNum, element="mol2dPic", legend='', inline=false) {
+      const text = sdfContent[molNum]
+      var mol = RDKitModule.get_mol(text);
+      //now do the drawing stuff:
+      molName = mol.get_prop("_Name");
+      mol2d = RDKitModule.get_mol(mol.get_smiles());
+
+      //add properties to the molProps div:
+      var descriptors = JSON.parse(mol.get_descriptors());
+      var mpdiv = document.getElementById("molProps");
+      console.log(descriptors);
+      console.log(descriptors['exactmw']);
+      mpdiv.innerHTML = "<br><b>ID: </b>" + molName + "<br><br>";
+      [
+        "exactmw",
+        "CrippenClogP",
+        "tpsa",
+        "lipinskiHBA",
+        "lipinskiHBD",
+        ].forEach(function(descriptorName) {
+          //        mpdiv.innerHTML += `<div>${descriptorName}: ${descriptors[descriptorName]}</div>`
+          mpdiv.innerHTML += `<b>${descriptorName}:</b> ${descriptors[descriptorName]}<br>`
+      });
+
+      var mdetails = {}
+      mdetails['legend'] = 'ID: ' + molName
+      var svg = mol2d.get_svg_with_highlights(JSON.stringify(mdetails));
+      if (svg == "") return;
+      var ob = document.getElementById(element);
+      if (inline) {
+        ob.outerHTML = "<div id='"+element+"' class='column'>" + svg + "</div>";
+      } else {
+        ob.outerHTML = "<div id='"+element+"'>" + svg + "</div>";
+        mol.delete();
+      }
+    }
+
+    function handleFileDrop(boxNumber, event) {
+      console.log(boxNumber)
+      event.preventDefault();
+      
+      const file = event.dataTransfer.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = function () {
+        const content = reader.result;
+        if (boxNumber === 1 && file.name.endsWith('.pdb')) {
+          blob1 = new Blob([content]);
+          fileDropBox1.textContent = "Protein: " + file.name;
+          fileDropBox1.style.border = '2px dashed #00ff84';
+          box1Done = true;
+          console.log(box1Done);
+        } else if (boxNumber === 2 && file.name.endsWith('.sdf')) {
+          blob2 = new Blob([content]);
+          fileDropBox2.textContent = "SDF: " + file.name;
+          fileDropBox2.style.border = '2px dashed #00ff84';
+          box2Done = true;
+        } else if ( (boxNumber === 1) && (!file.name.endsWith('.pdb')) ) {
+          //reset box title and colours if it's not a pdb file.
+          fileDropBox1.textContent = 'Must be PDB. Drop PDB here';
+          fileDropBox1.style.border = '1px dashed #ccc';
+        } else if ( (boxNumber === 2) && (!file.name.endsWith('.sdf')) ) {
+          //reset box title and colours if it's not a pdb file.
+          fileDropBox2.textContent = 'Must be SDF. Drop SDF here';
+          fileDropBox2.style.border = '1px dashed #ccc';
+        }
+        
+        // Check if both blobs are loaded
+        if (blob1 && blob2) {
+          bothBlobsReady = true;
+          console.log('read thecontents');
+          actionButton.removeAttribute("disabled");
+          // Both blobs are loaded, you can now do something with their contents
+          console.log("Blob 1 is a:", blob1);
+          console.log("Blob 2 is a:", blob2);
+          
+          // parse the PDB blob.
+          const blobReader1 = new FileReader();
+          blobReader1.onload = (blobEvent) => {
+            pdbContent = blobEvent.target.result;
+          }
+          blobReader1.readAsText(blob1);
+          
+          //parse the SDF blob.
+          const blobReader2 = new FileReader();
+          blobReader2.onload = (blobEvent) => {
+            const delimiter = /(\$\$\$\$\n)/g;
+            const blobContents = blobEvent.target.result;
+            const blocks = blobContents.split(delimiter).filter(Boolean);
+            const result = [];
+            for (let i = 0; i < blocks.length; i += 2) {
+              const block = blocks[i] + (blocks[i + 1] || '');
+              result.push(block);
+            } 
+            sdfContent = result;
+          }
+          blobReader2.readAsText(blob2);
+
+        }
+      };
+      
+      reader.readAsArrayBuffer(file);
+    }
+    
+    //make nice colors on drag-over
+    fileDropBox1.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      fileDropBox1.style.border = '2px dashed #007bff'; // blue
+    });
+    fileDropBox2.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      fileDropBox2.style.border = '2px dashed #007bff'; // blue
+    });
+    //return color to grey, or green if box is filled with data
+    fileDropBox1.addEventListener("dragleave", function(e) {
+      //fileDropBox1.style.border = '1px dashed #ccc';
+      if (box1Done) {
+        //set colour to green again
+        fileDropBox1.style.border = '2px dashed #00ff84';
+      } else {
+        //set colour to dark
+        fileDropBox1.style.border = '1px dashed #ccc';
+      }
+    });
+    fileDropBox2.addEventListener("dragleave", function(e) {
+      if (box2Done) {
+        fileDropBox2.style.border = '2px dashed #00ff84';
+      } else {
+        fileDropBox2.style.border = '1px dashed #ccc';
+      }
+    });
+
+    //handle actually dropping a file
+    fileDropBox1.addEventListener("drop", function (e) {
+      handleFileDrop(1, e);
+    });
+    fileDropBox2.addEventListener("drop", function (e) {
+      handleFileDrop(2, e);
+    });
+
+    // On main button push, prepare the molecule button. 
+    actionButton.addEventListener('click', function(e) {
+      renderButton.removeAttribute("disabled");
+      nextButton.removeAttribute("disabled");
+      prevButton.removeAttribute("disabled");
+
+      //const text = sdfContent[0]
+      drawMol(currMol);
+    });
+
+    prevButton.addEventListener('click', function(e) {
+      currMol--
+      currMol = Math.max(currMol, 0);
+      drawMol(currMol);
+    });
+    nextButton.addEventListener('click', function(e) {
+      currMol++
+      currMol = Math.min(currMol, sdfContent.length-1);
+      drawMol(currMol);
+    });
+
+    renderButton.addEventListener('click', function(e) {
+      stage.removeAllComponents();
+      Promise.all([
+        stage.loadFile(new Blob([pdbContent], {type: "text/plain"}), {ext:"pdb", defaultRepresentation: true}),
+        stage.loadFile(new Blob([sdfContent[currMol]], {type: "text/plain"}), {ext:"sdf", defaultRepresentation: true})
+      ]).then(function (ol) {
+        var cs = NGL.concatStructures(
+          "concat",
+          ol[ 0 ].structure.getView(new NGL.Selection("not ligand")),
+          ol[ 1 ].structure.getView(new NGL.Selection(""))
+        )
+        var comp = stage.addComponentFromObject(cs)
+        var nearLigSel = new NGL.Selection("HET")
+        sel = comp.structure.getAtomSetWithinSelection(nearLigSel, 6);
+        //create a set to store the residue indices of nearby atoms:
+        var nearRes = new Set();
+        var ap = comp.structure.getAtomProxy()
+        for (const item of sel.toArray()) {
+          ap.index = item;
+          nearRes.add(ap.residue.resno);
+        }
+
+        console.log('selection string is:' + Array.from(nearRes).join(", ") + " and (not _H)")
+        comp.addRepresentation("contact", {
+          masterModelIndex: 0,
+          weakHydrogenBond: true,
+          maxHbondDonPlaneAngle: 35,
+          sele: "",
+          filterSele: "ligand"
+        })
+        comp.addRepresentation("line", { //or licorice
+          sele: "(" + Array.from(nearRes).join(", ") + ")" + " and not _H",
+          multipleBond: "offset",
+        })
+        comp.autoView("ligand");
+        stage.setFocus(90)
+/*        var selection = new NGL.Selection("HET")
+        comp.structure.eachAtom(function(ap) {
+          console.log(ap) // The "ap" argument provided here is an AtomProxy instance
+        }, selection) */
+      });
+    });
+
+  </script>
+</body>
+</html>
