@@ -10,7 +10,7 @@
         <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
 	    <meta name="twitter:card" content="summary"></meta>
 	    <meta name="twitter:site" content="@lewischewis"></meta>
-        <meta name="twitter:title" content="Browser dockviz"></meta>
+        <meta name="twitter:title" content="In-browser dockviz"></meta>
         <meta name="twitter:description" content="with NGL+RDKitJS"></meta>
 
         <style>
@@ -65,7 +65,7 @@
 
     <p>I'm not a frontend dev, so the result isn't pretty - except where it counts! NGL does a nice job of rendering ligands in a protein pocket, including the surrounding residues and non-covalent interactions calculated on the fly. RDKitJS helps out substantially by providing 2D images and molecular properties. It's still far from a full-featured SBDD tool, but it's great for having a quick look at a series of compounds.
     
-  <p>Hopefully it's self explanatory, but to use it: upload a pdb file of the protein in the pdb box, and an SDF of ligands in the SDF box. Click "Prepare SDF" to parse it and load it up into the Molecule Bar with RDKitJS. You can select which molecule to render in this bar with the Prev and Next buttons, then click "Render in NGL" to show the selected molecule from the Molecular Bar in the main NGL window. You can quickly flip through the molecules to make a selection, and click Render to display that one in 3D. 
+  <p>Hopefully it's self explanatory, but to use it: upload a pdb file of the protein in the pdb box, and an SDF of ligands in the SDF box. Click "Prepare SDF" to parse it and load it up into the Molecule Bar with RDKitJS. You can select which molecule to render in this bar with the Prev and Next buttons, then click "Render in NGL" to show the selected molecule from the Molecule Bar in the main NGL window. You can quickly flip through the molecules to make a selection, and click Render to display that one in 3D. 
 
   <p>Lastly, on confidentiality: all the data and compute are located in your own browser, and no data is uploaded to someone else's computer. Of course, to verify this, just read the source - it's a single HTML file!
     
