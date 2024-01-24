@@ -266,8 +266,12 @@
           sele: "(" + Array.from(nearRes).join(", ") + ")" + " and not _H",
           multipleBond: "offset",
         })
-        comp.autoView("ligand");
-        stage.setFocus(90)
+        //comp.autoView("ligand");
+        comp.stage.animationControls.zoomMove(
+          comp.getCenter("ligand"),
+          -50
+        )
+        stage.setFocus(70)
 /*        var selection = new NGL.Selection("HET")
         comp.structure.eachAtom(function(ap) {
           console.log(ap) // The "ap" argument provided here is an AtomProxy instance
