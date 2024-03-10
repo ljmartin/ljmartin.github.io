@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2024-01-24">
+        <!-- alternative nav bar: https://nixing.mx/blog/css-grid-nav-bar.html -->
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	    <meta name="twitter:card" content="summary"></meta>
+	    <meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="SASA calculation"></meta>
+        <meta name="twitter:description" content="in numpy"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> SASA in numpy </h1>
+  <a href="https://gist.github.com/ljmartin/2daa60f58abccaf4696a2fdda1ef6737">Gist here</a>
+  <p>The solvent-exposed surface area of a molecule is a simplification of how much water an atom can touch in a given conformation. It's simplified because water is made of discrete particles rather than a continuum (<a href="https://pubs.acs.org/doi/10.1021/jp709958f">example</a> of why this matters), but the simplification has a nice linear correlation to the hydrophobic effect (<a href="https://pubmed.ncbi.nlm.nih.gov/18930735/">link</a>).
+
+  <p>The Shrake-Rupley algorithm is an approximation to this simplification, and works by counting the number of points on the surface of a sphere (representing an atom) that are not covered by any other atom. This could work for the VdW surface, too, but in this case the atom radii are expanded by, usually, 1.4 Å, corresponding to the approximate radius of a water molecule. This works well because hydrogens are small with respect to an oxygen atom, so water is kind of a sphere:<br>
+
+    <img src="../data/water_edensity.png" alt="water elecron density", width=300>
+
+  <p>Despite all these simplifications and approximations, SASA via Shrake-Rupley is a useful tool. I wanted a way to calculate it without dependencies. So this is an example of calculating it in numpy. The results line up well with other libraries commonly used for SASA calculation:
+    
+    <script src="https://gist.github.com/ljmartin/2daa60f58abccaf4696a2fdda1ef6737.js"></script>
