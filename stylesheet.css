@@ -56,7 +56,7 @@ h1, h2 {
 h1,
 h2,
 strong {
-  color: #333;
+  color: #555;
 }
 
 code,
@@ -75,9 +75,10 @@ pre {
 }
 
 a {
-    color: #1843a1;
+    /*    color: #1843a1;*/
+    color: #5F5F5F
 }
 
 a:visited {
-    color: #657fb8;/*#5880d6;*/
+    color: #A1A1A1;/*#657fb8;/*#5880d6;*/
 }
