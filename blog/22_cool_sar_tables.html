@@ -45,12 +45,13 @@
 
 <main>
   <h1> HTML SAR tables with pandas </h1>
+
 <!--  <a href="https://gist.github.com/ljmartin/2daa60f58abccaf4696a2fdda1ef6737">Gist here</a> -->
   <p>I often want to share a set of structures and assay readouts with someone. This someone has a range of legal/scientific/computational expertise, so there's no single format that suits everyone. <a href="https://ljmartin.github.io/blog/12_sdf_parquet.html">Parquet has a lot of</a> advantages for the computationally-minded. An SDF with property fields is a great format - but what if you want pictures, like concentration-response curves? What if you want to embed all the data in a text document? This info can add a lot of useful context, and is only interpretible if viewed right next to both the chemical structures and the readout numbers.</p>
 
-  <p>How does one combine these data types? Many compchemists will use a pandas table inside a jupyter notebook (I do) - so let's start there and reproduce it in a format that can be loaded by anyone with a computer, namely HTML or PDF, while also rendering relevant images. Here's an example of the end-product:</p>
+  <p>How does one combine these data types? Many compchemists will use a pandas table inside a jupyter notebook (I do) - so let's start there and reproduce it in a format that can be loaded by anyone with a computer, namely HTML, while also rendering relevant images. Here's an example of the end-product - note you can click the headers to sort the table rows::</p>
   <center>
-  <img src="../data/svg_table.png" alt="svg table example", width=300>
+    <iframe src="../data/svg.html" width="100%" height="500"></iframe>
   </center>
   
   <p>To start, I'll pull some data from a j.med.chem. article as an example. It's hard-coded here in case the link changes one day. These data are from <a href="https://doi.org/10.1021/acs.jmedchem.2c01521">https://doi.org/10.1021/acs.jmedchem.2c01521</a>, which reports PDE10A catalytic site inhibitors - as an aside, thank you to JMedChem for encouraging SMILES CSVs as supplementary data!
@@ -59,6 +60,8 @@
   <pre>
 import pandas as pd
 from io import StringIO
+from rdkit import Chem
+from rdkit.Chem import rdMolDescriptors
 csvstring = """Cmpd #,SMILES,PDE10A Ki (nM)
 2,c1(Cl)c(C)c(NCc2c(C)nc(C)s2)nc(OCCCc3nc(cccc4)c4cc3)n1,0.008
 18,c1nc([C@@H]2[C@@H](COc3cc(NCc4sc(C)nn4)nc(C)n3)C2)ccc1C,0.029
@@ -81,6 +84,11 @@ Pyp-1,c1(ccn2)n2c(NCc3cnn(C)c3)cc(OC[C@@H]4[C@@H](c5ncccc5)C4)n1,0.23
 1,Clc(c(C)c(nc1C2CC2)Cl)n1,8700
 """
 df = pd.read_csv(StringIO(csvstring))
+df['mols'] = df['SMILES'].apply(Chem.MolFromSmiles)
+df['cLogP'] = df['mols'].apply(rdMolDescriptors.CalcCrippenDescriptors).str[0]
+df['HAC'] = df['mols'].apply(rdMolDescriptors.CalcNumHeavyAtoms)
+df['LE'] = (df['PDE10A Ki (nM)']/1e9).apply(math.log10)*-1 / df['HAC']
+df.drop('mols', axis=1, inplace=True)
   </pre>
 
   <p>
@@ -144,12 +152,19 @@ htmldf = df.drop(
 
   </pre>
 
-  <p>Admittedly it's not pretty. It is flexible though - the <code>styles</code> list is just setting a bunch of CSS that describes how to render the HTML output, so just chatgpt some different CSS if you want to highlight certain cells, or change the alignment (e.g. "text-align", "left"). Exporting to html is done like so:
+  <p>Admittedly it's not pretty. It is flexible though - the <code>styles</code> list is just setting a bunch of CSS that describes how to render the HTML output, so just chatgpt some different CSS if you want to highlight certain cells, or change the alignment (e.g. "text-align", "left"). Exporting to html is done like so, while adding the javascript "sorttable" library:
   </p>
+
 <pre>
 htmldf.hide_index_=[True]
 htmldf.to_html('./svg.html')
- </pre>
+htmlstring = open('svg.html').read()
+with open('svg.html','w') as f:
+    f.write(
+    &quot;&quot;&quot;&lt;script src=&quot; https://cdn.jsdelivr.net/npm/sorttable@1.0.2/sorttable.min.js &quot;&gt;&lt;/script&gt;&quot;&quot;&quot;
+    )
+    f.write(htmlstring.replace('&lt;table ', '&lt;table class=&quot;sortable&quot; '))
+</pre>
 
 <p>
   You can do the same with PNG outputs by going via base64 encoding. The rendering won't be as smooth, but it may be easier to convert into other formats (e.g. <code>pandoc png.html -o my_table.[pdf,md,docx]</code>). If you want to add graphing outputs, like sensorgrams or the dreaded graphpad prism readout, PNG is probably a requirement because the raw data may not be available for plotting in SVG. The key changes here are using <code>rdMolDraw2D.MolDraw2DCairo</code> and also wrapping the raw png data in a "Data URI" to indicate that the picture data are base64 encoded:
