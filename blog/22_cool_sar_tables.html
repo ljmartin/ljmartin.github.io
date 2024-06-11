@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2025-016-04">
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	<meta name="twitter:card" content="summary"></meta>
+	<meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="HTML SAR tables"></meta>
+        <meta name="twitter:description" content="with pandas"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> HTML SAR tables with pandas </h1>
+<!--  <a href="https://gist.github.com/ljmartin/2daa60f58abccaf4696a2fdda1ef6737">Gist here</a> -->
+  <p>I often want to share a set of structures and assay readouts with someone. This someone has a range of legal/scientific/computational expertise, so there's no single format that suits everyone. <a href="https://ljmartin.github.io/blog/12_sdf_parquet.html">Parquet has a lot of</a> advantages for the computationally-minded. An SDF with property fields is a great format - but what if you want pictures, like concentration-response curves? What if you want to embed all the data in a text document? This info can add a lot of useful context, and is only interpretible if viewed right next to both the chemical structures and the readout numbers.</p>
+
+  <p>How does one combine these data types? Many compchemists will use a pandas table inside a jupyter notebook (I do) - so let's start there and reproduce it in a format that can be loaded by anyone with a computer, namely HTML or PDF, while also rendering relevant images. Here's an example of the end-product:</p>
+  <center>
+  <img src="../data/svg_table.png" alt="svg table example", width=300>
+  </center>
+  
+  <p>To start, I'll pull some data from a j.med.chem. article as an example. It's hard-coded here in case the link changes one day. These data are from <a href="https://doi.org/10.1021/acs.jmedchem.2c01521">https://doi.org/10.1021/acs.jmedchem.2c01521</a>, which reports PDE10A catalytic site inhibitors - as an aside, thank you to JMedChem for encouraging SMILES CSVs as supplementary data!
+  </p>
+
+  <pre>
+import pandas as pd
+from io import StringIO
+csvstring = """Cmpd #,SMILES,PDE10A Ki (nM)
+2,c1(Cl)c(C)c(NCc2c(C)nc(C)s2)nc(OCCCc3nc(cccc4)c4cc3)n1,0.008
+18,c1nc([C@@H]2[C@@H](COc3cc(NCc4sc(C)nn4)nc(C)n3)C2)ccc1C,0.029
+17,c1nc([C@@H]2[C@@H](COc3cc(NCc4sc(C)nn4)nc(C)n3)C2)ccc1OC,0.038
+4,O(c1nc(Cl)c(C)c(NCc2cnn(C)c2)c1)C[C@@H]3[C@@H](c4ncccc4)C3,0.047
+14,c1nc([C@@H]2[C@@H](COc3cc(NCc4cn(C)nc4)nc(C)n3)C2)ccc1OC,0.054
+15,c1nc([C@@H]2[C@@H](COc3cc(NCc4cn(C)nc4)nc(C)n3)C2)ccc1C,0.061
+12,c(cccn1)(n2)c1c(NCc(s3)nnc3C)cc2OC[C@H]([C@H]4c5ncccc5)C4,0.11
+10,c(ccnc1)(n2)c1c(NCc(cnn3C)c3)cc2OC[C@H]([C@H]4c5ncccc5)C4,0.12
+9,c(cncc1)(n2)c1c(NCc(cnn3C)c3)cc2OC[C@H]([C@H]4c5ncccc5)C4,0.13
+Pyp-1,c1(ccn2)n2c(NCc3cnn(C)c3)cc(OC[C@@H]4[C@@H](c5ncccc5)C4)n1,0.23
+16,c1nc([C@@H]2[C@@H](COc3cc(NCc4sc(C)nn4)nc(C)n3)C2)ccc1,0.33
+3,c1(Cl)c(C)c(NCc2cnn(C)c2)nc(OC[C@@H]3[C@@H](c4ncccc4)C3)n1,0.44
+7,c1(cccc2)c2c(NCc(c3)cnn3C)cc(OC[C@H]([C@H]4c5ncccc5)C4)n1,0.49
+13,c1nc([C@@H]2[C@@H](COc3cc(NCc4cn(C)nc4)nc(C)n3)C2)ccc1,0.6
+11,c(cccn1)(n2)c1c(NCc(cnn3C)c3)cc2OC[C@H]([C@H]4c5ncccc5)C4,0.87
+5,O(c1cc(Cl)c(C)c(NCc2cnn(C)c2)n1)C[C@@H]3[C@@H](c4ncccc4)C3,3.2
+6,O(c1ncc(C)c(NCc2cnn(C)c2)c1)C[C@@H]3C[C@H]3c4ncccc4,7.8
+8,c1(nccc2)c2c(NCc(c3)cnn3C)cc(OC[C@H]([C@H]4c5ncccc5)C4)n1,8.6
+1,Clc(c(C)c(nc1C2CC2)Cl)n1,8700
+"""
+df = pd.read_csv(StringIO(csvstring))
+  </pre>
+
+  <p>
+    This will render nicely enough in a jupyter notebook. Now we can add images of the molecules in a way that will render in html so that we can share it. The trick is just to add a column containing the SVG data of each picture that you want. In this case I'm just using pictures of the molecules - afterwards, I demonstrate how to use PNG images so you could include graphing outputs too:
+  </p>
+  
+  <pre>
+
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem.Draw import rdMolDraw2D
+
+svgstrings = []
+for smi in df['SMILES']:
+    mol = Chem.MolFromSmiles(smi)
+    AllChem.Compute2DCoords(mol)
+    d = rdMolDraw2D.MolDraw2DSVG(150, 65) # or MolDraw2DCairo to get PNGs, with base64 encoding.
+    opt = d.drawOptions()
+    opt.bondLineWidth=0.65 #thin bonds looks better at this molsize
+    rdMolDraw2D.PrepareAndDrawMolecule(d, mol, )
+    d.FinishDrawing()
+    txt = d.GetDrawingText()
+    svgstrings.append(txt)
+
+df['Mol'] = svgstrings
+
+
+styles = [
+    #table properties
+    dict(selector=" ", 
+         props=[("margin","0"),
+                ("font-family",'"Helvetica", "Arial", sans-serif'),
+                ("border-collapse", "collapse"),
+                ("border","none"),
+                   ]),
+
+    #background shading
+    dict(selector="tbody tr:nth-child(even)",
+         props=[("background-color", "#fff")]),
+    dict(selector="tbody tr:nth-child(odd)",
+         props=[("background-color", "#eee")]),
+
+    #cell spacing
+    dict(selector="td", 
+         props=[("padding", ".5em")]),
+
+    #header cell properties
+    dict(selector="th", 
+         props=[("font-size", "100%"),
+                ("text-align", "center")]),
+]
+htmldf = df.drop(
+    "SMILES", axis=1
+).rename(
+    {"PDE10A Ki (nM)":"Ki (nM)"},axis=1
+).round(
+    3
+).astype(
+    'str'
+).style.set_table_styles(styles)
+
+  </pre>
+
+  <p>Admittedly it's not pretty. It is flexible though - the <code>styles</code> list is just setting a bunch of CSS that describes how to render the HTML output, so just chatgpt some different CSS if you want to highlight certain cells, or change the alignment (e.g. "text-align", "left"). Exporting to html is done like so:
+  </p>
+<pre>
+htmldf.hide_index_=[True]
+htmldf.to_html('./svg.html')
+ </pre>
+
+<p>
+  You can do the same with PNG outputs by going via base64 encoding. The rendering won't be as smooth, but it may be easier to convert into other formats (e.g. <code>pandoc png.html my_table.[pdf,md,docx]</code>). If you want to add graphing outputs, like sensorgrams or the dreaded graphpad prism readout, PNG is probably a requirement because the raw data may not be available for plotting in SVG. The key changes here are using <code>rdMolDraw2D.MolDraw2DCairo</code> and also wrapping the raw png data in a "Data URI" to indicate that the picture data are base64 encoded:
+</p>
+<pre>
+import base64
+
+pngstrings = []
+for smi in df['SMILES']:
+    mol = Chem.MolFromSmiles(smi)
+    AllChem.Compute2DCoords(mol)
+    d = rdMolDraw2D.MolDraw2DCairo(200, 125)
+    opt = d.drawOptions()
+    opt.bondLineWidth=0.65
+    rdMolDraw2D.PrepareAndDrawMolecule(d, mol, )
+    d.FinishDrawing()
+    txt = d.GetDrawingText()
+    b = base64.b64encode(txt).decode()
+    bstr = f'<img src="data:image/png;base64,{b}" alt="mol">'
+    pngstrings.append(bstr)
+df['Mol'] = pngstrings
+</pre>
+  <p>
+    All in all: if you or a collabrator just want to parse a table of molecules:readouts:graphs, for a single congeneric series, it's a reliable way to generate a SAR table. 
+</pre>
+<p>
+
+  
+
+
