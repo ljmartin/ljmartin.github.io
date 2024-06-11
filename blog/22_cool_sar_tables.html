@@ -152,7 +152,7 @@ htmldf.to_html('./svg.html')
  </pre>
 
 <p>
-  You can do the same with PNG outputs by going via base64 encoding. The rendering won't be as smooth, but it may be easier to convert into other formats (e.g. <code>pandoc png.html my_table.[pdf,md,docx]</code>). If you want to add graphing outputs, like sensorgrams or the dreaded graphpad prism readout, PNG is probably a requirement because the raw data may not be available for plotting in SVG. The key changes here are using <code>rdMolDraw2D.MolDraw2DCairo</code> and also wrapping the raw png data in a "Data URI" to indicate that the picture data are base64 encoded:
+  You can do the same with PNG outputs by going via base64 encoding. The rendering won't be as smooth, but it may be easier to convert into other formats (e.g. <code>pandoc png.html -o my_table.[pdf,md,docx]</code>). If you want to add graphing outputs, like sensorgrams or the dreaded graphpad prism readout, PNG is probably a requirement because the raw data may not be available for plotting in SVG. The key changes here are using <code>rdMolDraw2D.MolDraw2DCairo</code> and also wrapping the raw png data in a "Data URI" to indicate that the picture data are base64 encoded:
 </p>
 <pre>
 import base64
