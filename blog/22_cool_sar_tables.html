@@ -59,6 +59,7 @@
 
   <pre>
 import pandas as pd
+import math
 from io import StringIO
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors
@@ -183,7 +184,7 @@ for smi in df['SMILES']:
     d.FinishDrawing()
     txt = d.GetDrawingText()
     b = base64.b64encode(txt).decode()
-    bstr = f'<img src="data:image/png;base64,{b}" alt="mol">'
+    bstr = f'&lt;img src="data:image/png;base64,{b}" alt="mol"&gt;'
     pngstrings.append(bstr)
 df['Mol'] = pngstrings
 </pre>
