@@ -9,6 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.20/jspdf.plugin.autotable.min.js"></script>
     <script src="https://unpkg.com/@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,15 +27,32 @@
     </style>
 </head>
 <body>
-    <input type="file" id="fileInput" accept=".json">
+    <input type="file" id="fileInput" accept=".csv">
     <button id="downloadButtonCSV" style="display: none;">Download CSV</button>
-    <button id="downloadButtonPDF" style="display: none;">Download PDF</button>
-    
+    <button id="addEmptyColumn" style="display: none;">Add Empty Column</button>
+    <!-- <button id="removeColumn" style="display: none;">Remove Column</button> -->
+    <div id="removeColumnContainer" style="display: none;">
+        <input type="text" id="removeColumnNameInput" placeholder="Enter column name",>
+        <button id="removeColumn"><- Permanently delete column</button>
+    </div>
+    <!-- <div id="hideShowColumnContainer" style="display: none;">
+        <input type="text" id="hideShowColumnNameInput" placeholder="Enter column name">
+        <button id="hideShowColumn">Hide/show column</button>
+    </div> -->
+    <div id="hideShowColumnContainer" style="display: none;">
+        <select id="hideShowColumnSelect">
+            <option value="">Select a column</option>
+            <!-- Column options will be dynamically added here -->
+        </select>
+        <button id="hideShowColumn"><- Hide/show column</button>
+    </div>
     <div id="table-container"></div>
 
     <script>
         let table;
         let columns;
+        let newColName='newCol';
+        let numNewCols=0;
 
         async function addMols(array) {
             const RDKitModule = await initRDKitModule();
@@ -54,44 +72,109 @@
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             const reader = new FileReader();
+            Papa.parse(file, {
+                complete: function(results) {
+                    jsonData = convertToArrayOfObjects(results.data);
+                    addMols(jsonData).then(result => {
+                        createTable(result);
+                        populateColumnDropdown();
+                    });
+                    document.getElementById('downloadButtonCSV').style.display = 'block';
+                    document.getElementById('addEmptyColumn').style.display = 'block';
+                    //document.getElementById('removeColumn').style.display = 'block';
+                    document.getElementById('removeColumnContainer').style.display = 'block';
+                    document.getElementById('hideShowColumnContainer').style.display = 'block';
+                }
+            })
+        })
 
-            reader.onload = function(e) {
-                let jsonData = JSON.parse(e.target.result);
-                // add rdkit mols here. 
-                addMols(jsonData).then(result => {
-                    //console.log('added mols')
-                    createTable(result);
-                });
-                console.log(jsonData)
-                document.getElementById('downloadButtonCSV').style.display = 'block';
-                document.getElementById('downloadButtonPDF').style.display = 'block';
-            };
+        function convertToArrayOfObjects(data) {
+            const headers = data[0];
+            const jsonData = [];
 
-            reader.readAsText(file);
-        });
-
-
+            for (let i = 1; i < data.length; i++) {
+                let obj = {};
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = data[i][j];
+                }
+                jsonData.push(obj);
+            }
+            return jsonData;
+        }
 
         document.getElementById("downloadButtonCSV").addEventListener("click", function(){
             table.download("csv", "data.csv");
         });
-        document.getElementById("downloadButtonPDF").addEventListener("click", function(){
-            table.download("pdf", "data.pdf");
-        });
-        // document.getElementById('downloadButton').addEventListener('click', function() {
-        //     const data = table.getData();
-        //     const jsonString = JSON.stringify(data, null, 2);
-        //     const blob = new Blob([jsonString], { type: 'application/json' });
-        //     const url = URL.createObjectURL(blob);
-            
-        //     const a = document.createElement('a');
-        //     a.href = url;
-        //     a.download = 'table_data.json';
-        //     document.body.appendChild(a);
-        //     a.click();
-        //     document.body.removeChild(a);
-        //     URL.revokeObjectURL(url);
-        // });
+        document.getElementById("addEmptyColumn").addEventListener("click", function () {
+                //table.download("csv", "data.csv");
+                table.addColumn(
+                    { 
+                        title: "N/A", 
+                        //field: newColName + numNewCols,
+                        field: 'N/A',
+                        editor: "input",
+                        editable: false,  
+                        editableTitle: true,
+                        cellDblClick: function (e, cell) {
+                            cell.edit(true);
+                        },
+                    }, 
+                    true,
+                    "name"
+                );
+                numNewCols++;
+                populateColumnDropdown();
+                
+            });
+        document.getElementById('removeColumn').addEventListener('click', function () {
+                const columnToDelete = document.getElementById('removeColumnNameInput').value;
+                if (columnToDelete) {
+                    // Call your function to remove the column using the columnName
+                    cols = table.getColumns();
+                    cols.forEach(column => {
+                        if (column.getDefinition().title === columnToDelete) {
+                            column.delete();
+                        }
+                    });
+                } else {
+                    alert('Please enter a column name');
+                }
+            });
+
+        document.getElementById('hideShowColumn').addEventListener('click', function () {
+                const columnToHide = document.getElementById('hideShowColumnSelect').value;
+                if (columnToHide) {
+                    cols = table.getColumns();
+                    cols.forEach(column => {
+                        if (column.getDefinition().title === columnToHide) {          
+                            if (column.isVisible()) {
+                                column.hide();
+                            } else {
+                                column.show();
+                            }
+                        }
+                    });
+                } else {
+                    alert('Please select a column');
+                }
+            });
+        
+        function populateColumnDropdown() {
+            const select = document.getElementById('hideShowColumnSelect');
+            //const table = document.getElementById('#table-container').tabulator;
+            const columns = table.getColumns();
+
+            // Clear existing options
+            select.innerHTML = '<option value="">Select a column</option>';
+
+            // Add an option for each column
+            columns.forEach(column => {
+                const option = document.createElement('option');
+                option.value = column.getField();
+                option.textContent = column.getDefinition().title || column.getField();
+                select.appendChild(option);
+            });
+        }
 
         function createTable(data) {
             if (!Array.isArray(data) || data.length === 0) {
@@ -105,13 +188,18 @@
             }
 
             columns = Object.keys(data[0]).map(key => ({
-                title: key.charAt(0).toUpperCase() + key.slice(1),
+                //title: key.charAt(0).toUpperCase() + key.slice(1),
+                title: key,
                 field: key,
                 editor: "input",
                 editable: false,  
-               cellDblClick:function(e, cell){
-                cell.edit(true);
+                cellDblClick:function(e, cell){
+                    cell.edit(true);
                 },
+                editableTitle: true,
+                // headerDblClick: function (e, cell) {
+                //     cell.edit(true);
+                // },
                 //...(key === "molsvg" ? { formatter: "image" } : {})
                 ...(key === "molsvg" ? {
                     formatter: svgFormatter,
@@ -119,8 +207,6 @@
                     //height: 150 // Adjust as needed
                 } : {})
             }));
-            console.log('columns next up:');
-            console.log(columns);
 
             table = new Tabulator("#table-container", {
                 data: data,
@@ -131,24 +217,19 @@
                 paginationSize: 10,
                 paginationSizeSelector: [5, 10, 20, 50],
                 movableColumns: true,
-                resizableRows: true
+                resizableRows: true,
+            })
+            table.on("columnTitleChanged", function (column) {
+                column.updateDefinition({ field: column.getDefinition().title }).then(result => {;
+                    populateColumnDropdown();
+                })
+            });
+            //});
+            table.on("tableBuilt", function () {
+                populateColumnDropdown();
             });
 
         }
-
-        // function createColumnToggles() {
-        //     const container = document.getElementById('controlsContainer');
-        //     container.innerHTML = ''; // Clear existing controls
-        //     container.style.display = 'block';
-
-        //     columns.forEach(column => {
-        //         const toggle = document.createElement('button');
-        //         toggle.textContent = `${column.title}: Editable`;
-        //         toggle.className = 'column-toggle';
-        //         toggle.addEventListener('click', () => toggleColumnEdit(column, toggle));
-        //         container.appendChild(toggle);
-        //     });
-        // }
 
 
     </script>
