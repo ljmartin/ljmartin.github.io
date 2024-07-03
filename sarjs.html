@@ -29,23 +29,26 @@
 <body>
     <input type="file" id="fileInput" accept=".csv">
     <button id="downloadButtonCSV" style="display: none;">Download CSV</button>
-    <button id="addEmptyColumn" style="display: none;">Add Empty Column</button>
-    <!-- <button id="removeColumn" style="display: none;">Remove Column</button> -->
+
     <div id="removeColumnContainer" style="display: none;">
         <input type="text" id="removeColumnNameInput" placeholder="Enter column name",>
         <button id="removeColumn"><- Permanently delete column</button>
     </div>
-    <!-- <div id="hideShowColumnContainer" style="display: none;">
-        <input type="text" id="hideShowColumnNameInput" placeholder="Enter column name">
-        <button id="hideShowColumn">Hide/show column</button>
-    </div> -->
+
     <div id="hideShowColumnContainer" style="display: none;">
         <select id="hideShowColumnSelect">
             <option value="">Select a column</option>
-            <!-- Column options will be dynamically added here -->
         </select>
         <button id="hideShowColumn"><- Hide/show column</button>
     </div>
+
+    <div id="addColumnContainer" style="display: none;">
+        <select id="addColumnSelect">
+            <option value="">Select a column</option>
+        </select>
+        <button id="addColumnOption"><- Add column of type</button>
+    </div>
+
     <div id="table-container"></div>
 
     <script>
@@ -69,67 +72,140 @@
             }))
         }
 
+        function fillNewColumnDropdown() {
+                const select = document.getElementById('addColumnSelect');
+                select.innerHTML = '<option value="">Select a column</option>';
+
+                const option1 = document.createElement('option')
+                option1.value = 'Tick'
+                option1.textContent = 'Tick'
+                select.appendChild(option1)
+
+                const option2 = document.createElement('option')
+                option2.value = 'Empty'
+                option2.textContent = 'Empty'
+                select.appendChild(option2)
+            }
+
+        function removeEmptyLastRow(arr) {
+            if (arr.length > 0) {
+                const lastRow = arr[arr.length - 1];
+                const isEmpty = Object.values(lastRow).every(value => value === undefined || value === "");
+                if (isEmpty) {
+                    return arr.slice(0, -1);
+                }
+            }
+            return arr;
+        }
+
+        function convertToArrayOfObjects(data) {
+                const headers = data[0];
+                const jsonData = [];
+
+                for (let i = 1; i < data.length; i++) {
+                    let obj = {};
+                    for (let j = 0; j < headers.length; j++) {
+                        obj[headers[j]] = data[i][j];
+                    }
+                    jsonData.push(obj);
+                }
+                return removeEmptyLastRow(jsonData);
+                
+            }
+
+
+
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             const reader = new FileReader();
             Papa.parse(file, {
                 complete: function(results) {
                     jsonData = convertToArrayOfObjects(results.data);
+                    console.log("ehre comes the parse data:");
+                    console.log(jsonData);
                     addMols(jsonData).then(result => {
                         createTable(result);
                         populateColumnDropdown();
                     });
                     document.getElementById('downloadButtonCSV').style.display = 'block';
-                    document.getElementById('addEmptyColumn').style.display = 'block';
-                    //document.getElementById('removeColumn').style.display = 'block';
                     document.getElementById('removeColumnContainer').style.display = 'block';
                     document.getElementById('hideShowColumnContainer').style.display = 'block';
+                    document.getElementById('addColumnContainer').style.display = 'block';
+                    fillNewColumnDropdown();
                 }
             })
         })
 
-        function convertToArrayOfObjects(data) {
-            const headers = data[0];
-            const jsonData = [];
-
-            for (let i = 1; i < data.length; i++) {
-                let obj = {};
-                for (let j = 0; j < headers.length; j++) {
-                    obj[headers[j]] = data[i][j];
-                }
-                jsonData.push(obj);
-            }
-            return jsonData;
-        }
-
         document.getElementById("downloadButtonCSV").addEventListener("click", function(){
             table.download("csv", "data.csv");
         });
-        document.getElementById("addEmptyColumn").addEventListener("click", function () {
-                //table.download("csv", "data.csv");
+
+        document.getElementById("addColumnOption").addEventListener("click", function () {
+            const columnToAdd = document.getElementById('addColumnSelect').value;
+            // if it's tick cross:
+            if (columnToAdd=='Tick') {
+                cols = table.getColumns();
+                const nTicks = cols.reduce((count, column) => {
+                    //return column.name === "Tick" ? count + 1 : count;
+                    return /^Tick\d+$/.test(column.getDefinition().title) ? count + 1 : count;
+                }, 0);
+
                 table.addColumn(
-                    { 
-                        title: "N/A", 
-                        //field: newColName + numNewCols,
-                        field: 'N/A',
+                    {
+                        title: "Tick"+nTicks, 
+                        field: "Tick"+nTicks, 
+                        formatter: "tickCross", 
+                        editableTitle: true,
+                        formatterParams: {
+                            allowEmpty: true,
+                            //crossElement: false
+                        },
+                        hozAlign: "center",
+                        responsive: 1, 
+
+                        // approach one - switch back and forth.
+                        // cellClick: function (e, cell) {
+                        //     cell.setValue(!cell.getValue());
+                        // }
+                        
+                        // approach two (editor)
+                        editor: 'input',
+                        cellDblClick: function (e, cell) {
+                            cell.edit(true);
+                        },
+                    },
+                    true,
+                    "name"
+                )
+            }
+            // if it's empty:
+            if (columnToAdd==='Empty') {
+                cols = table.getColumns();
+                const nEmptys = cols.reduce((count, column) => {
+                    //return column.name === "Tick" ? count + 1 : count;
+                    return /^Empty\d+$/.test(column.getDefinition().title) ? count + 1 : count;
+                }, 0);
+                table.addColumn(
+                    {
+                        title: "Empty"+nEmptys,
+                        field: 'Empty'+nEmptys,
                         editor: "input",
-                        editable: false,  
+                        editable: false,
                         editableTitle: true,
                         cellDblClick: function (e, cell) {
                             cell.edit(true);
                         },
-                    }, 
+                    },
                     true,
                     "name"
                 );
-                numNewCols++;
-                populateColumnDropdown();
-                
-            });
+            }
+            populateColumnDropdown();
+        });
+
         document.getElementById('removeColumn').addEventListener('click', function () {
                 const columnToDelete = document.getElementById('removeColumnNameInput').value;
                 if (columnToDelete) {
-                    // Call your function to remove the column using the columnName
                     cols = table.getColumns();
                     cols.forEach(column => {
                         if (column.getDefinition().title === columnToDelete) {
@@ -146,6 +222,7 @@
                 if (columnToHide) {
                     cols = table.getColumns();
                     cols.forEach(column => {
+
                         if (column.getDefinition().title === columnToHide) {          
                             if (column.isVisible()) {
                                 column.hide();
@@ -158,23 +235,24 @@
                     alert('Please select a column');
                 }
             });
-        
+
         function populateColumnDropdown() {
             const select = document.getElementById('hideShowColumnSelect');
             //const table = document.getElementById('#table-container').tabulator;
             const columns = table.getColumns();
-
-            // Clear existing options
             select.innerHTML = '<option value="">Select a column</option>';
-
-            // Add an option for each column
             columns.forEach(column => {
                 const option = document.createElement('option');
-                option.value = column.getField();
+                option.value = column.getDefinition().title;
                 option.textContent = column.getDefinition().title || column.getField();
                 select.appendChild(option);
             });
         }
+
+        function allBooleanLike(arr) {
+                const booleanValues = ['true', 'false', '1', '0', true, false, 1, 0, ''];
+                return arr.every(item => booleanValues.includes(String(item).toLowerCase()));
+            }
 
         function createTable(data) {
             if (!Array.isArray(data) || data.length === 0) {
@@ -186,6 +264,18 @@
                 const svgString = cell.getValue();
                 return `<div style="width: 100%; height: 100%;">${svgString}</div>`;
             }
+
+            const dtypes = {};
+            keys = Object.keys(data[0])
+            const booleanValues = ['true', 'false', '1', '0', true, false, 1, 0, ''];
+            keys.forEach(key => {
+                const columndata = data.map(row => row[key]);
+                // const isBool = allBooleanLike(columndata)
+                isBool = columndata.every(item => booleanValues.includes(String(item).toLowerCase()))
+                dtypes[key] = isBool;
+            })
+
+            console.log(dtypes)
 
             columns = Object.keys(data[0]).map(key => ({
                 //title: key.charAt(0).toUpperCase() + key.slice(1),
@@ -205,24 +295,41 @@
                     formatter: svgFormatter,
                     //width: 175, // Adjust as needed
                     //height: 150 // Adjust as needed
+                } : {}),
+                ...(dtypes[key] ? { 
+                    formatter: "tickCross", 
+                    formatterParams: {
+                                allowEmpty: true,
+                                //crossElement: false
+                            },
+                    hozAlign: "center",
+                    responsive: 1,
+
                 } : {})
             }));
 
             table = new Tabulator("#table-container", {
+                columnDefaults: {
+                    vertAlign: "middle"
+                },
                 data: data,
                 columns: columns,
                 //layout: "fitColumns",
                 layout: "fitData",
                 pagination: "local",
+                hozAlign: "center",
                 paginationSize: 10,
                 paginationSizeSelector: [5, 10, 20, 50],
                 movableColumns: true,
                 resizableRows: true,
             })
+            // table.on("columnTitleChanged", function (column) {
+            //     column.updateDefinition({ field: column.getDefinition().title }).then(result => {;
+            //         populateColumnDropdown();
+            //     })
+            // });
             table.on("columnTitleChanged", function (column) {
-                column.updateDefinition({ field: column.getDefinition().title }).then(result => {;
                     populateColumnDropdown();
-                })
             });
             //});
             table.on("tableBuilt", function () {
