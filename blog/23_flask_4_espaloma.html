@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2025-016-04">
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	<meta name="twitter:card" content="summary"></meta>
+	<meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Local flask server"></meta>
+        <meta name="twitter:description" content="for espaloma"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Local flask server for espaloma </h1>
+
+  <p>Last week I wanted some reasonable partial charges to help with an atom typing experiment. The Chodera lab's <a href="https://github.com/choderalab/espaloma_charge">Espaloma Charge</a> model is super fast and apparently high quality (an alternative to use might be <a href="https://ehjc.gitbook.io/kallisto/features/eeq">kallisto</a>). Trying to install Espaloma immediately ruined my conda env thanks to conflicts with DGL/pytorch versions, so I decided it's best to put it in a separate, cordoned off, environment. So now I've got two environments - one with all my working libraries, and a separate one just for espaloma. How do I get molecule structure information out of the former, and into the latter, and then return the partial charges? I <em>don't</em> want to write the SMILES/SDF to file, stop, instantiate the other environment, parse the file, write out the charges, move back, and then load the charges. So many fiddly steps! And I want it to be interactive.</p>
+
+  <p>The answer was to set up a little local server, using Flask and running Espaloma, to which I could POST a SMILES code or SDF block, allow the server to run the espaloma charging function, and return the partial charges as a JSON.</p>
+
+  <p>Setting up this espaloma/flask server looks like this:</p>
+  <pre>
+from flask import Flask, request, jsonify
+import numpy as np
+from rdkit import Chem
+
+from espaloma_charge import charge
+
+app = Flask(__name__)
+
+@app.route('/process', methods=['POST'])
+def process():
+    data = request.json
+    input_string = data['input']
+    m = Chem.MolFromMolBlock(input_string)
+    result = charge(m)
+    return jsonify(result.tolist())
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+  </pre>
+
+  <p>Run it in the shell, with the espaloma environment activated, and let it sit there to wait patiently for POST'd data. Now, in the working environment (for me a notebook), run:</p>
+  <pre>
+import requests
+import json
+response = requests.post('http://localhost:5000/process', json={'input': Chem.MolToMolBlock(m)})
+partial_charges = np.array(response.json())
+  </pre>
+
+  <p>et voila:</p>
+  <pre>
+array([-0.19000548, -0.19000548,  0.63194072,  0.63194072,  0.45600772,
+   -0.49415129,  0.34710342, -0.20972057,  0.49532843, -1.00420523,
+   -0.6615752 , -0.6615752 , -0.34363997, -0.28776151,  1.65871096,
+   -0.17839202])
+    </pre>
+  
+
+
+  
+
+
