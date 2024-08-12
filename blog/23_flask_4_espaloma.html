@@ -64,7 +64,7 @@ app = Flask(__name__)
 def process():
     data = request.json
     input_string = data['input']
-    m = Chem.MolFromMolBlock(input_string)
+    m = Chem.MolFromMolBlock(input_string, removeHs=False) # do NOT remove Hs ;)
     result = charge(m)
     return jsonify(result.tolist())
 
