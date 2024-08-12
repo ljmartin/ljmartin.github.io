@@ -10,7 +10,7 @@
 	<meta name="twitter:card" content="summary"></meta>
 	<meta name="twitter:site" content="@lewischewis"></meta>
         <meta name="twitter:title" content="Local flask server"></meta>
-        <meta name="twitter:description" content="for espaloma"></meta>
+        <meta name="twitter:description" content="for espaloma charge"></meta>
 
         <style>
           hr {
@@ -44,7 +44,7 @@
 </nav>
 
 <main>
-  <h1> Local flask server for espaloma </h1>
+  <h1> Local flask server for espaloma charge </h1>
 
   <p>Last week I wanted some reasonable partial charges to help with an atom typing experiment. The Chodera lab's <a href="https://github.com/choderalab/espaloma_charge">Espaloma Charge</a> model is super fast and apparently high quality (an alternative to use might be <a href="https://ehjc.gitbook.io/kallisto/features/eeq">kallisto</a>). Trying to install Espaloma immediately ruined my conda env thanks to conflicts with DGL/pytorch versions, so I decided it's best to put it in a separate, cordoned off, environment. So now I've got two environments - one with all my working libraries, and a separate one just for espaloma. How do I get molecule structure information out of the former, and into the latter, and then return the partial charges? I <em>don't</em> want to write the SMILES/SDF to file, stop, instantiate the other environment, parse the file, write out the charges, move back, and then load the charges. So many fiddly steps! And I want it to be interactive.</p>
 
