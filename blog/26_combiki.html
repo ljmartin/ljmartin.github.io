@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2025-016-04">
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	<meta name="twitter:card" content="summary"></meta>
+	<meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Combining Ki's"></meta>
+        <meta name="twitter:description" content="demo using kinetinc modeling in scipy"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Combining Ki's demo using kinetic modeling in scipy </h1>
+
+  <p></p>
+    
+  <p>The paper <a href="https://chemrxiv.org/engage/api-gateway/chemrxiv/assets/orp/resource/item/60c741a7337d6c2c57e26903/original/converting-smiles-to-stacking-interaction-energies.pdf">Converting SMILES to Stacking Interaction Energies</a> by Andrea N. Boostma and Steven E. Wheeler has some really appealing figures, in addition to the useful featurization and modelling work. Figure 6 shows several heterocycles accompanied by contour plots of the electrostatic potential. This is really a great figure because it makes the modelling work intuitively clear. It's also a good alternative to RDKit's <a href="https://www.rdkit.org/docs/GettingStartedInPython.html#generating-similarity-maps-using-fingerprints">Similarity Maps</a>, so I'd like to try using it for visualizing partial charges, explaining contributions to scoring functions, and similarity maps. The notebook below is an attempt to recreate such a figure!</p>
+
+  <p>Posting the original figure here since it's open access:</p>
+  <img src="../data/color_esp_orig.png", width=400>
+
+  <p>The outcome is pretty close, but do note there's a few approximations that mean it's just a demo:<br/>
+    &mdash; It uses 2D coordinates from RDKit instead of an optimized 3D structure<br/>
+    &mdash; It uses fixed partial charges from RDKit's extended huckel method<br/>
+    &mdash; The ESP is calculated with an approximation used <a href="https://www.cgl.ucsf.edu/chimerax/docs/user/commands/coulombic.html">in ChimeraX</a> and is not converted to kcal/mol. <br/>
+  </p>
+  <p>All this means the results might not be useful for serious modelling tasks, but it's aesthetically pretty close.<br/><br/>EDIT: Steven Wheeler (PI) commented about converting to kcal/mol, so now the units in the notebook should be approximately correct (any errors are mine!)</p>
+
+  <img src="../data/color_esp.png", width=200>
+<script src="https://gist.github.com/ljmartin/b253152f5824d3922e7c73737cdb0b0e.js"></script>
+
+
