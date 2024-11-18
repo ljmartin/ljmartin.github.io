@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2025-016-04">
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	<meta name="twitter:card" content="summary"></meta>
+	<meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Boltz-1 on Modal"></meta>
+        <meta name="twitter:description" content="A100s for all"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Boltz-1 on Modal </h1>
+  <a href="https://gist.github.com/ljmartin/e7a05aaf3ad573478f97ac7c271ea27b">Gist link to modal input script here</a>
+
+  <p>Like everyone else, I was excited to see the release of Boltz-1 - a cofolding model, in the same cohort as AlphaFold 3, with MIT-licensed code and weights. While I don't think cofolding models are quite ready for "prime time", at least we'll all be able to explore their strengths and weaknesses more easily when we can run the code using data related to commercial projects.</p>
+
+  <p>I got OOMs on an AWS instance, so instead here is a way to run Boltz-1 on Modal in order to easily ramp up the GPU type and discover the required hardware more quickly. The example job required at least an A100 so, if you don't have one of those around, this Modal job could also be the primary way to use boltz1.</p>
+
+  <p>This Modal script  downloads the weights into the modal image, so they'll only need to be downloaded once, while setting up. uv is used to install, and it seemed to work out of the box. The whole script works by reading a sequence alignment (a3m file) and input yaml file from your local machine, then passing those as raw text to the remote GPU-enabled machine, where the <code>boltz predict</code> command is executed. The results are packaged into a tar.gz file which gets return to you locally.</p>
+
+  <p>The example used in the script comes from the examples directory in the Boltz-1 github repo. The file paths in the input yaml have to be slightly changed, so look in the gist for the <code>ligand.yaml</code> file.</p>
