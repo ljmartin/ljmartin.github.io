@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2025-016-04">
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	<meta name="twitter:card" content="summary"></meta>
+	<meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="Chai-1 on Modal"></meta>
+        <meta name="twitter:description" content="A100s for all"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Chai-1 on Modal </h1>
+  <a href="https://gist.github.com/ljmartin/cccf3778f956f7af7f9289c979bc86c4">Gist link to modal input script here</a>
+
+  <p>Looks like the commercial licensing of Boltz-1 led to a lot of interest in using that toolkit. This is a great example of how to get interest (and then citations) for your software project - make your code easy to use! The interest seems to have spurred commercial licensing of the Chai-1 cofolding model, which was previously only available via their servers. Presumably no commercially-sensitive project would have used that route since it involves disclosure to an external party.</p>
+
+  <p>Here's how to run Chai-1 on Modal if you are GPU poor. Like the <a href="https://ljmartin.github.io/blog/26_boltzmodal.html">boltz-1 example</a>, the weights are downloaded into the Modal image to avoid paying for GPU time while the weights download every time you run it. That does mean you'd need to update the image definition if new weights get released. The script is just the example script from the Chai-1 repo.</p>
+
+  <p>While I'm not familiar with the workings of Chai-1, the inputs seem to use ESM-Fold embeddings, so no MSA is required - just a fasta and the SMILES. In my opinion this is a better way to achieve generalization to novel binding sites (e.g. first-in-class or cryptic sites), and I look forward to verifying that!</p>
+
+
+
+
+
