@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2025-016-04">
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	<meta name="twitter:card" content="summary"></meta>
+	<meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="BioEmu on Modal"></meta>
+        <meta name="twitter:description" content="for GPU poor"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> BioEmu on Modal </h1>
+  <a href="https://gist.github.com/ljmartin/a590fd59ff101fe8f08feb81a0652803">Gist link to modal input script here</a>
+
+  <p>Like many others, I enjoyed using Chai and Boltz on Modal. Not to take away from the scientific achievement of those works, but I tried them on some favourite (unpublished) test cases and they did not predict the correct binding site. It seems the literature is heading to this conclusion, too, e.g. <a href='https://www.biorxiv.org/content/10.1101/2024.06.03.597219v1'>this paper</a> or <a href='https://www.biorxiv.org/content/10.1101/2025.02.03.636309v2'>this one</a></p>
+
+  <p>As an alternative to cofolding models, it would be nice to expose a cryptic site by generating an ensemble of conformations of some protein of interest. Once the site is exposed, then regular, boring, modeling techniques that have stood the test of time (e.g. docking) might work well. Molecular dynamics might expose such cryptic sites given a very long time. Neverthless, no matter what additional techniques you use, such as cosolvent simulations or enhanced sampling, it'll take a while and some not insignificant money, so it won't be a standard approach for most people.</p>
+
+  <p>Instead, there are now protein structure-prediction models that aim to generate conformer ensembles. One such model was trained in multiple stages on a dizzying multi-modal dataset, including experimental stabilities, molecular dynamics, and static snapshots. I'd never heard of it until seeing an experimental notebook in the ColabFold repo use it, which didn't work for me. So, today's snippet shares how to run BioEmu on Modal for the fellow GPU-poor. This took some serious tinkering - Modal is fussy at the best of times, but BioEmu wants you to install colabfold, which would require a fresh conda, followed by installing colabfold into that conda without activating the environment, then finally patching several files. There's a uv virtual env tucked in there somewhere, too. Obviously that will completely screw with a Modal instance. But the magic incantation does exist, and here it is.</p>
+
+  <p>The example snippet uses T4 lysozyme and generates 50 samples, apparently in proportion to their free energy if you believe the paper. At first glance, this might be true. Some samples are filtered out due to unphysical geometry. The output is in an xtc file, which can be parsed easily enough with MDTraj or MDAnalysis. Pro tip: do not use HPacker to rebuild sidechains. Use <a href="https://academic.oup.com/bioinformatics/article/36/12/3758/5817305">Yang Zhang's FASPR</a> instead - faster, already works perfectly, and much less fiddly. 
