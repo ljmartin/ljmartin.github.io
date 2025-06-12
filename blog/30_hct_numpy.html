@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2025-016-04">
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	<meta name="twitter:card" content="summary"></meta>
+	<meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="HCT solvation in numpy"></meta>
+        <meta name="twitter:description" content="or jax"></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> HCT solvation in numpy </h1>
+  <a href="https://gist.github.com/ljmartin/7c1d8386ca84972e8bdc317cd7c09d11">Gist link to notebook here</a>
+
+  <p>A great collaborative paper recently demonstrated how to use implicit solvation to filter out inactives from a list of high-scoring docked compounds: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11275789/">Identifying Artifacts from Large Library Docking</a>. At a time when AI hype is high, papers like this are a nice reminder that there's a lot of useful improvement we can wring out of classical algorithms. It would be nice to tweak such solvation models so to improve performance. A good starting point is a hackable (ideally differentiable) implementation in python. 
+
+  <p>The field of implicit solvation is somewhat complicated, with lots of jargon and algorithms that span several linebreaks in the parent publication. At the heart of the complexity is the fact that there are many ways to calculate the effective Born radius. The HCT model was an early one. It assumes each nearby atom, to the atom of interest, will remove a sphere of solvent equal to the size of the vDW sphere. We know water molecules are excluded from more than just the vDW surface - see <a href="https://ljmartin.github.io/blog/04_meshing_ses.html">Meshing the solvent-excluded surface</a> - but it was a reasonable approximation and works well when an atom isn't too buried (e.g. small molecules). 
+
+  <p>Once you've got a Born radius, everything else is pretty much the same. So implementing the HCT model in numpy is a good starting point to sanity check the results. I found the <a href="https://doi.org/10.1016/0009-2614(95)01082-K">original HCT publication</a> impenetrable, but thankfully the <a href="https://github.com/openmm/openmm/blob/88f32f2d0c2594455631be132825c578b46290c7/wrappers/python/openmm/app/internal/customgbforces.py#L519">OpenMM implementation</a> is clear to me. So, in this notebook, I use openforcefield/openmmforcefields, espaloma, and OpenMM to parameterize a small molecule (indomethacin) and print out the solvation energy according to the HCT model. Following this, I calculate it with numpy and show that the result is the same. By itself, this code doesn't do anything that OpenMM couldn't do - but, of course, one could port this to jax or mlx and run gradient descent against any of the input parameters (many of which have empirically-determined values anyway). 
+
+<script src="https://gist.github.com/ljmartin/7c1d8386ca84972e8bdc317cd7c09d11.js"></script>
