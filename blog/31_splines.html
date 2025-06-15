@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Lewis J. Martin</title>
-        <meta itemprop="datePublished" content="2025-016-04">
+        <meta itemprop="datePublished" content="2025-06-16">
         <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
 	<meta name="twitter:card" content="summary"></meta>
 	<meta name="twitter:site" content="@lewischewis"></meta>
@@ -45,12 +45,16 @@
 
 <main>
   <h1> Splines demo </h1>
-  <a href="">Gist link to notebook here</a>
+  <a href="https://github.com/ljmartin/ljmartin.github.io/blob/main/notebooks/fit-splines.ipynb">Link to notebook here</a>
 
   <p>There are many modeling tasks in computational chemistry that can be addressed with a smooth function that varies by distance (e.g. additive forcefields used in molecular dynamics and conformer generation). These functions are usually a balance between accuracy with respect to the underlying physical process on the one hand, and being fast to calculate on the other. One solution I don't see a lot is splines, but these seem like ideal functions for compchem, being smooth and adjustable to many situations without requiring any specification of a functional form.
 
   <p>Today's notebook demonstrates how to use b-splines to fit simple smooth curves in 1D and 2D. While it's not an in-depth or rigorous mathematical description of the workings of b-splines, having some hands-on code to play with, and plot, helped me to build intuition around how one might use splines in an ML setting. And that intuition is mainly this: the complexity in implementing B-splines can be abstracted away into scipy.interpolate's BSpline method. That method outputs an embedding of your input features, transforming them into a new coordinate system which is favourable for smooth regression. If you wanted the complexity, then the <a href="https://github.com/KindXiaoming/pykan/blob/ecde4ec3274d3bef1ad737479cf126aed38ab530/kan/spline.py#L4">torch implementation of the recursive Cox/de Boor algorithm</a> in the PyKAN library is be a good start.  
 
 
-
-<script src=""></script>
+<iframe 
+  src="https://nbviewer.jupyter.org/github/ljmartin/ljmartin.github.io/blob/main/notebooks/fit-splines.ipynb"
+  width="100%" 
+  height="600"
+  frameborder="0">
+</iframe>
