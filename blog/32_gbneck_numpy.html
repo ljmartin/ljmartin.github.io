@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2025-06-16">
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	<meta name="twitter:card" content="summary"></meta>
+	<meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="GBNeck2 in numpy"></meta>
+        <meta name="twitter:description" content=""></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> Spline regression demo </h1>
+  <a href="https://gist.github.com/ljmartin/4113fae9c7aa29d5736bcfb2cda291b6">Link to gist notebook here</a>
+
+  <p>The snippet from two posts ago demonstrated how to calculate solvation energy, according to the HCT model, using numpy. We'll move now to the GBNeck model - but first, some notes on terminology. The HCT model was so named because it was published by Hawkins, Cramer, and Truhlar. It assumed that each atom occludes one VDW sphere of solvent. Subsequently experience showed this approximation is OK for small molecules but, for larger molecules (proteins) where you have atoms that are completely buried, the approximation diverges from reality. The problem is in the calculation of the Born radius, which is underestimated thanks to assuming that the interstices between atoms are filled with solvent, even if they couldn't fit a whole, discrete, water molecule. And so <a href="https://pubmed.ncbi.nlm.nih.gov/15048829/">Onufriev, Bashford, and Case published</a> an update to rescale the Born radii, which is now referred to as OBC. I always go to <a href="http://docs.openmm.org/latest/userguide/application/02_running_sims.html#implicit-solvent">the OpenMM docs</a> to find a table of AMBER names (e.g. igb1, igb2...), jargon names, and references for these solvation models. 
+
+  <p>Nevertheless, the OBC rescaling doesn't entirely fix the problem of counting up occupied volume. When two atoms are close together, there is a collar of volume that is excluded from solvent. <a href="https://pubmed.ncbi.nlm.nih.gov/21072141/">Mongan et al</a> refer to this as a 'neck' (shaded region):<br/>
+
+    <img src="https://cdn.ncbi.nlm.nih.gov/pmc/blobs/e7b2/2975579/e1c4a8268c03/nihms240891f1.jpg" alt="Mongans neck">
+
+  <p>
+    
+
+
+
