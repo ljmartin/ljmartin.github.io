@@ -45,7 +45,7 @@
 
 <main>
   <h1> Spline regression demo </h1>
-  <a href="https://gist.github.com/ljmartin/4113fae9c7aa29d5736bcfb2cda291b6">Link to gist notebook here</a>
+  <a href="https://gist.github.com/ljmartin/3d8c352d3c8be17802a41de5f778f4d4">Link to gist notebook here</a>
 
   <p>The snippet from two posts ago demonstrated how to calculate solvation energy, according to the HCT model, using numpy. We'll move now to the GBNeck model - but first, some notes on terminology. The HCT model was so named because it was published by Hawkins, Cramer, and Truhlar. It assumed that each atom occludes one VDW sphere of solvent. Subsequently experience showed this approximation is OK for small molecules but, for larger molecules (proteins) where you have atoms that are completely buried, the approximation diverges from reality. The problem is in the calculation of the Born radius, which is underestimated thanks to assuming that the interstices between atoms are filled with solvent, even if they couldn't fit a whole, discrete, water molecule. And so <a href="https://pubmed.ncbi.nlm.nih.gov/15048829/">Onufriev, Bashford, and Case published</a> an update to rescale the Born radii, which is now referred to as OBC. I always go to <a href="http://docs.openmm.org/latest/userguide/application/02_running_sims.html#implicit-solvent">the OpenMM docs</a> to find a table of AMBER names (e.g. igb1, igb2...), jargon names, and references for these solvation models. 
 
@@ -55,7 +55,8 @@
 
   <p>When there are multiple atoms nearby, the occluded shape would be more complex, but this additive, pairwise approximation seems to improve the performance. It's slow to calculate how this volume contributes to solvation on the fly, but the GBNeck paper describes an approximation of the approximation that is much faster, making it amenable for MD.
 
-  <p>This snippet demonstrates how to calculate GBNeck2 solvation energy using numpy, which is relatively straightforward to plug in to scoring functions or to make differentiable. 
+  <p>This snippet demonstrates how to calculate GBNeck2 solvation energy using numpy, which is relatively straightforward to plug in to scoring functions or to make differentiable. 0C0D0D
+
+<script src="https://gist.github.com/ljmartin/3d8c352d3c8be17802a41de5f778f4d4.js"></script>
 
 
-<script src="https://gist.github.com/ljmartin/4113fae9c7aa29d5736bcfb2cda291b6.js"></script>
