@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2025-06-16">
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+	<meta name="twitter:card" content="summary"></meta>
+	<meta name="twitter:site" content="@lewischewis"></meta>
+        <meta name="twitter:title" content="PDF summary in opencode"></meta>
+        <meta name="twitter:description" content=""></meta>
+
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+  <h1> PDF transcription in OpenCode </h1>
+  <a href="https://gist.github.com/ljmartin/c25e3cc5c85e6aefc6ce3b541a5acb40">Gist link to transcription 'skill'</a>
+  
+  <p>One of my biggest use-cases for LLMs has been PDF summary and review. For example "did this crystal structure publication report a potency? What assay did they use? Is it commercial or bespoke? Cellular or cell-free?" etc... Sure Claude is great for this - drop in related open-access PDFs and you can summarise a whole field in a few hours. For whatever reason, though, Anthropic's content filter is now too sensitive, and legitimate research into chemistry and drug discovery topics end up killing these review sessions. Constantly.
+
+  <p>So it would be nice to have a backup approach. Internally, Claude would convert an academic PDF into text before tokenizing and holding that in its context for downstream summary or review. Remarkably, the best way to do this is <i>not</i> extracting the text and images from with the PDF, but simply taking a snapshot of each page as an image (using, e.g. pdftoppm) and then running them one by one through a vision model to transcribe the text. It sounds like this would be really noisy but, with modern models, for some reason it's not. Today's open weights models can handle multiple columns, text boxes, remove page numbers, and will include figure interpretations.
+
+  <p>My own setup uses OpenCode, with whom I have no affiliation. I set up billing as pay-per-token (which they call Zen) to avoid being throttled, and use the model Kimi K2.5, which is a vision model. This approach requires setting up a 'SKILL.md' to instruct the model how to perform the transcription - I posted mine in the gist above. A script to transcribe a bunch of pdfs would thus look like:
+    <br>
+    <br>
+    <pre style="white-space: pre-wrap;"><code>
+for pdf in ./pdfs/*.pdf; do
+    base=$(basename "$pdf" .pdf)
+    echo $base
+    [ -f "$base.md" ] && continue   # skip if already processed
+    mkdir -p "$base"
+    pdftoppm -png -r 150 "$pdf" "$base/page"
+    opencode run --model opencode/kimi-k2.5 "transcribe the PDF contents in ./$base"
+    rm -r $base
+done
+    </code></pre>
+    <br>
+    <br>
+    
+  <p>The transcribed output seems looks good to me and, anecdotally, provides a much more pleasant reading experience compared to a PDF. For example, see <a href="https://sdocs.dev/s/ZyQVnaa3#k=_IsyAZNmqA5h_o06QUPHvEg480oLVPYw9VIHJTrTOtg">martin2014 rendered on sdoc here</a>. 
+
+  <p>Of course the real utility is in what you do next with the transcribed works. I've found that ingesting several papers as markdown format fits well within the context budget of the open weights models on OpenCode, so a natural next step is to ask for a Q&A document that answers all your questions, pointing to quotes or locations in the source text, for posterity. What's particularly nice about this is that even if LLMs don't improve at all from today, this is still a huge timesaver. 
+
