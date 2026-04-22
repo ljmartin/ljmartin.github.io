@@ -12,6 +12,10 @@
         <meta name="twitter:title" content="PDF summary in opencode"></meta>
         <meta name="twitter:description" content=""></meta>
 
+	<!-- SDoc's CSS from CDN (MIT licensed) -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sdocs-dev/public/css/tokens.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sdocs-dev/public/css/rendered.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
         <style>
           hr {
             border: none;
@@ -44,18 +48,23 @@
 </nav>
 
 <main>
-  <h1> My Title </h1>
-<!-- SDoc's CSS from CDN (MIT licensed) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sdocs-dev/public/css/tokens.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sdocs-dev/public/css/rendered.css">
 
 <div id="rendered" style="max-width: 720px; padding: 2rem;"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js"></script>
 <script>
-  fetch('../data/martin2014.md')
-    .then(r => r.text())
-    .then(md => {
-      document.getElementById('rendered').innerHTML = marked.parse(md);
-    });
+ fetch('../data/martin2014.md')
+   .then(r => r.text())
+   .then(md => {
+     document.getElementById('rendered').innerHTML = marked.parse(md);
+     renderMathInElement(document.getElementById('rendered'), {
+       delimiters: [
+         { left: '$$', right: '$$', display: true },
+         { left: '$',  right: '$',  display: false }
+       ]
+     });
+   });
 </script>
+
