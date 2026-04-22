@@ -44,11 +44,18 @@
 </nav>
 
 <main>
-  <h1> PDF transcription in OpenCode </h1>
-  <script
-  src="https://ljmartin.github.io/sdoc-embed.js"
-  data-src="https://sdocs.dev/s/ZyQVnaa3#k=_IsyAZNmqA5h_o06QUPHvEg480oLVPYw9VIHJTrTOtg"
-  data-height="500">
+  <h1> My Title </h1>
+<!-- SDoc's CSS from CDN (MIT licensed) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sdocs-dev/public/css/tokens.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sdocs-dev/public/css/rendered.css">
+
+<div id="rendered" style="max-width: 720px; padding: 2rem;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  fetch('../data/martin2014.md')
+    .then(r => r.text())
+    .then(md => {
+      document.getElementById('rendered').innerHTML = marked.parse(md);
+    });
 </script>
-  
-  
