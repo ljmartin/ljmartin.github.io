@@ -6,7 +6,7 @@ Instead, here is a public dataset of random drug-like molecules, which look very
 - Wim Dehean's [LACAN toolkit](https://github.com/dehaenw/lacan/)
 - [csvbase](https://csvbase.com)
 
-LACAN is a software package to generate molecules and calculate a goodness score (no deep learning required). The generation occurs by combining fragments, just like BRICS and RECAP might do. The score comes from comparing the neighbourhood of a new bond to some corpus (ChEMBL comes pre-installed). The trick to make this work seems to be using ECFP bits to define atomic environments, which to me makes it a variant of [Wave Function Collapse](https://robertheaton.com/2018/12/17/wavefunction-collapse-algorithm/). There's more details on LACAN from Wim [here](https://github.com/rdkit/UGM_2024/blob/main/Presentations/Dehaen_LACAN.pdf). 
+LACAN is a software package to generate molecules and calculate a goodness score, with no deep learning required. The generation occurs by combining fragments just like BRICS and RECAP might do. The score comes from comparing the neighbourhood of a new bond to some corpus, and the ChEMBL corpus comes pre-installed. The trick to make this work seems to be using ECFP bits to define atomic environments, which to me makes it a variant of [Wave Function Collapse](https://robertheaton.com/2018/12/17/wavefunction-collapse-algorithm/). There's more details on LACAN from Wim [here](https://github.com/rdkit/UGM_2024/blob/main/Presentations/Dehaen_LACAN.pdf). 
 
 csvbase is a online database for storing data snippets in csv format. The FAQ really says it all: https://csvbase.com/faq
 
