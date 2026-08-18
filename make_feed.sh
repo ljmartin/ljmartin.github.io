@@ -12,6 +12,8 @@ FEED_DESC="Compchem side projects and code snippets"
 BLOG_INDEX="blog.html"
 POSTS_DIR="blog/markdown-posts"
 OUT="blog/feed.xml"
+# Only the newest MAX_ITEMS posts are kept in the feed (0 = unlimited).
+MAX_ITEMS="${MAX_ITEMS:-20}"
 
 cd "$(dirname "$0")"
 
@@ -46,6 +48,10 @@ trap 'rm -rf "$tmp"' EXIT
 for md in "$POSTS_DIR"/*.md; do
   [ -e "$md" ] || continue
   base="$(basename "$md" .md)"
+  # skip templates/drafts (files starting with an underscore)
+  case "$base" in
+    _*) continue ;;
+  esac
 
   # title: front matter > first `# ` heading > blog.html anchor > filename
   title="$(frontmatter title "$md")"
@@ -87,7 +93,6 @@ for md in "$POSTS_DIR"/*.md; do
     printf '     <link>%s</link>\n' "$esc_url"
     printf '     <guid isPermaLink="true">%s</guid>\n' "$esc_url"
     printf '     <pubDate>%s</pubDate>\n' "$rfc"
-    printf '     <description><![CDATA[%s]]></description>\n' "$content"
     printf '     <content:encoded><![CDATA[%s]]></content:encoded>\n' "$content"
     printf '   </item>\n'
   } > "${tmp}/${pubdate}_${base}.xml"
@@ -106,7 +111,10 @@ done
 } > "$OUT"
 
 # shellcheck disable=SC2045
+n=0
 for f in $(ls -r "$tmp"); do
+  n=$((n + 1))
+  [ "$MAX_ITEMS" -gt 0 ] && [ "$n" -gt "$MAX_ITEMS" ] && break
   cat "${tmp}/$f" >> "$OUT"
 done
 

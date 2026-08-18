@@ -49,6 +49,9 @@
  fetch('./markdown-posts/drug-like-lacan-csvbase.md')
    .then(r => r.text())
    .then(md => {
+     // strip YAML front matter (--- ... ---) added for the RSS feed,
+     // so it doesn't render as visible content
+     md = md.replace(/^---[\s\S]*?---\s*/, '');
      document.getElementById('rendered').innerHTML = marked.parse(md);
      renderMathInElement(document.getElementById('rendered'), {
        delimiters: [
