@@ -1,3 +1,8 @@
+---
+title: Drug-like LACAN mols on csvbase
+date: 2026-08-18
+---
+
 # Drug-like LACAN mols on csvbase
 
 Lots of posts on the to-do list require a demo dataset of drug-like molecules. ChEMBL is a common source for these, but ChEMBL molecules require some kind of data cleaning. Also, since ChEMBL molecules are 'real', then eventually such a dataset would get out of date. 
