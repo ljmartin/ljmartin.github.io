@@ -5,7 +5,38 @@
   <link>https://ljmartin.github.io/</link>
   <description>Compchem side projects and code snippets</description>
   <language>en</language>
-  <lastBuildDate>Tue, 18 Aug 2026 00:00:00 +0000</lastBuildDate>
+  <lastBuildDate>Wed, 19 Aug 2026 00:00:00 +0000</lastBuildDate>
+   <item>
+     <title>Writing blogs in markdown</title>
+     <link>https://ljmartin.github.io/blog/blogs-in-markdown.html</link>
+     <guid isPermaLink="true">https://ljmartin.github.io/blog/blogs-in-markdown.html</guid>
+     <pubDate>Thu, 20 Aug 2026 00:00:00 +0000</pubDate>
+     <content:encoded><![CDATA[<h1 id="writing-blogs-in-markdown">Writing blogs in markdown</h1>
+<p>Previously, web files for this blog were written in emacs, editing
+the HTML by hand. Now they are written in markdown. That makes life a
+lot easier. The key piece of html - suggested by claude - is:</p>
+<pre><code>&lt;div id=&quot;rendered&quot; style=&quot;max-width: 720px; padding: 2rem;&quot;&gt;&lt;/div&gt;
+
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/marked/marked.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+ fetch(&#39;./markdown-posts/blogs-in-markdown.md&#39;)
+   .then(r =&gt; r.text())
+   .then(md =&gt; {
+     // strip YAML front matter (--- ... ---) added for the RSS feed,
+     // so it doesn&#39;t render as visible content
+     md = md.replace(/^---[\s\S]*?---\s*/, &#39;&#39;);
+     document.getElementById(&#39;rendered&#39;).innerHTML = marked.parse(md);
+     renderMathInElement(document.getElementById(&#39;rendered&#39;), {
+       delimiters: [
+         { left: &#39;$$&#39;, right: &#39;$$&#39;, display: true },
+         { left: &#39;$&#39;,  right: &#39;$&#39;,  display: false }
+       ]
+     });
+   });
+&lt;/script&gt;</code></pre>]]></content:encoded>
+   </item>
    <item>
      <title>Drug-like LACAN mols on csvbase</title>
      <link>https://ljmartin.github.io/blog/34_drug-like-lacan-csvbase.html</link>
