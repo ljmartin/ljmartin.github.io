@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Lewis J. Martin</title>
+        <meta itemprop="datePublished" content="2025-06-16">
+        <link rel="stylesheet" href="../stylesheet.css" media="screen"/>
+        <style>
+          hr {
+            border: none;
+            border-top: 3px double #333;
+            color: #333;
+            overflow: visible;
+            text-align: center;
+            height: 5px;
+          }
+
+          hr:after {
+            background: #fff;
+            content: '§';
+            padding: 0 4px;
+            position: relative;
+            top: -13px;
+          }
+        </style>
+</head>
+
+
+<nav>
+        <ul>
+                <li><strong>LJM</strong></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../papers.html">Papers</a></li>
+		<li><a href="../sideprojects.html">Side-projects</a></li>
+		<li><a href="../blog.html">Blog</a></li>
+        </ul>
+</nav>
+
+<main>
+
+<div id="rendered" style="max-width: 720px; padding: 2rem;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js"></script>
+<script>
+ fetch('./markdown-posts/blogs-in-markdown.md')
+   .then(r => r.text())
+   .then(md => {
+     // strip YAML front matter (--- ... ---) added for the RSS feed,
+     // so it doesn't render as visible content
+     md = md.replace(/^---[\s\S]*?---\s*/, '');
+     document.getElementById('rendered').innerHTML = marked.parse(md);
+     renderMathInElement(document.getElementById('rendered'), {
+       delimiters: [
+         { left: '$$', right: '$$', display: true },
+         { left: '$',  right: '$',  display: false }
+       ]
+     });
+   });
+</script>
+
